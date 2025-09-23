@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +9,12 @@
 <body>
     <h1>Welcome to the URL Shortener Service</h1>
     {% if shortcode %}
-        <p>Incorrect shortcode!</p>
+        <p>Incorrect shortcode: {{ shortcode }}</p>
     {% endif %}
+    <div>
+        <input type="number" id="userInput">
+        <button type="button" id="shortenButton">Shorten!</button>
+    </div>
+    <script src="{% static './main.js' %}"></script>
 </body>
 </html>
