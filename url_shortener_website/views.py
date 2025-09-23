@@ -1,6 +1,27 @@
 from django.shortcuts import render, redirect
 from .models import UrlMapping
 from django.contrib import messages # Only one message should be in the storage at all times!
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+import base62
+
+# Views related to the REST API
+
+@api_view(['POST'])
+def generate_shortcode(request):
+    url = request.POST.get('url', None)
+    if url is None:
+        return Response({"error": "No URL provided."})
+
+    # Add url verification here
+    shortcode = base62.encode(url)
+
+    print(shortcode)
+
+
+    return Response({"message": "Test"})
+
+# Views related to the website itself
 
 def url_shortener_view(request):
     context = {}
