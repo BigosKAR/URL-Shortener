@@ -8,27 +8,33 @@
     <link rel="stylesheet" href="{% static './styles.css' %}">
 </head>
 <body>
-    <div>
-        <div>
-            <div>
-                <h1 id="mainHeader">Welcome to the URL Shortener Service</h1>
+    <div id="mainTitleContainer">
+        <div id="mainTitleSubContainer">
+            <h1 id="mainHeader">URL Shortener</h1>
+            <p id="subText">
+                Shorten your URL with this website!
+                Input your URL into the designated area and press the "Shorten!" button.
+                A short URL will be generated and displayed on the screen.
+            </p>
+            <div id="interactiveContainer">
+                <div id="userInteractionContainer">
+                    <input id="userInput" placeholder="Paste your URL here...">
+                    <button type="button" id="shortenButton">Shorten!</button>
+                </div>
+                <div id="shortUrlContainer">
+                    <a id="shortUrl"></a>
+                    <button id="copyButton"><img id="copyImage" src="{% static 'copy_icon.png' %}"></button>
+                </div>
+                <div>
+                    <p id="errorMessage"></p>
+                </div>
             </div>
-            <img src="{% static './url_icon.png'}" alt="Url Icon">
         </div>
+        <img src="{% static 'url_icon.png' %}">
     </div>
     {% if shortcode %}
         <p id="incorrectShortcodeMsg">Incorrect shortcode: {{ shortcode }}</p>
     {% endif %}
-    <div>
-        <input id="userInput">
-        <button type="button" id="shortenButton">Shorten!</button>
-    </div>
-    <div>
-        <a id="shortUrl"></a>
-    </div>
-    <div>
-        <p id="errorMessage"></p>
-    </div>
     <script src="{% static './main.js' %}"></script>
 </body>
 </html>

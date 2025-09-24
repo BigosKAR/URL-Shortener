@@ -1,10 +1,12 @@
 let shortenButton = document.getElementById("shortenButton")
+let copyButton = document.getElementById("copyButton")
 
 shortenButton.addEventListener("click", () => {
     let userInput = document.getElementById("userInput")
     if(userInput.value !== ""){
         // defining elements we will change
         let displayErrorElement = document.getElementById("errorMessage");
+        let displayShortUrlContainer = document.getElementById("shortUrlContainer");
         let displayShortUrlElement = document.getElementById("shortUrl");
         let displayIncorrectShortcodeElement = document.getElementById("incorrectShortcodeMsg")
         
@@ -20,6 +22,9 @@ shortenButton.addEventListener("click", () => {
         xhr.onload = () => {
             if(xhr.status === 200 || xhr.status === 201){
                 const responseJSON = JSON.parse(xhr.response)
+                
+                displayShortUrlContainer.style.display = "flex";
+
                 displayShortUrlElement.href = responseJSON.success; 
                 displayShortUrlElement.innerHTML = responseJSON.success;
 
@@ -47,4 +52,12 @@ shortenButton.addEventListener("click", () => {
     else{
         alert("No input found.")
     }
+})
+
+copyButton.addEventListener("click", () => {
+    console.log("HELLO")
+    let shortUrlElement = document.getElementById("shortUrl");
+    navigator.clipboard.writeText(shortUrlElement.innerHTML);
+
+    alert("Copied to the clipboard")
 })

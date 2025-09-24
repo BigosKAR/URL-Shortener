@@ -1,7 +1,108 @@
+@font-face {
+	font-family: "Elure";
+	src: url("./Elure-woA9w.otf") format('opentype');
+}
+
+#mainTitleContainer {
+	display: flex;
+	justify-content: space-between;
+	padding-top: 100px;
+	margin: auto;
+	padding-left: 25%;
+	padding-right: 25%;
+}
+
+#mainTitleSubContainer {
+
+}
+
+#mainTitleText {
+
+}
+
 #mainHeader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  border: 3px solid green;
+	font-family: 'Elure';
+	font-size: 500%;
+	padding-right: 50px;
+}
+
+#subText {
+	font-family: 'Elure';
+	font-size: 150%;
+	text-align: justify;
+	padding-right: 50px;
+	padding-bottom: 50px;
+	width: 75%;
+}
+
+#shortenButton {
+	font-family:'Elure';
+	font-size: 50px;
+
+	transition-duration: 0.4s;
+	color: #1c7fff;
+	background-color: white;
+	width: 125px;
+	border-color: #1c7fff;
+	font-size: 25px;
+	border-radius: 10px;
+	padding: 10px;
+}
+
+#shortenButton:hover {
+	background-color:#1c7fff;
+	color: white;
+	border-color: #1c7fff;
+	border-radius: 10px;
+}
+
+#userInput {
+	width: 500px;
+	border-radius: 10px;
+	padding: 10px;
+	border-color: #1c7fff;
+	font-family:'Elure';
+	font-size: 25px;
+}
+
+#userInteractionContainer {
+	height: 75px;
+}
+
+#shortUrlContainer {
+	width: 500px;
+	border-style: solid;
+	background-color: white;
+	border-color: #1c7fff;
+	padding: 10px;
+	border-radius: 10px;
+	display: none;
+	justify-content: space-between;
+	align-items: center;
+	height: 40px;
+}
+
+#shortUrl {
+	font-family:'Elure';
+	font-size: 25px;
+	padding: 5px;
+}
+
+#copyButton {
+	color:black;
+	transition-duration: 0.4s;
+	background-color: #1c7fff;
+	border-style: hidden;
+	border-radius: 10px;
+	height: 40px;
+	width: 40px;
+}
+
+#copyButton:hover {
+	background-color: #24e1ba;
+}
+
+#copyImage {
+	height: 25px;
+	width: 25px;
 }
