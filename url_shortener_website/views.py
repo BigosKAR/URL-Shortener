@@ -57,6 +57,8 @@ def url_shortener_view(request):
     if len(saved_messages) != 0:
         # Messages need to be iterated because you are unable to access individual messages. Remember only one message should be in the storage at all times!
         for message in saved_messages:
+            if message == "favicon.ico":
+                continue # Edge case because the browser tries to access the icon
             print(f"{len(saved_messages)}: {message}")
             context['shortcode'] = message
         # Storage is cleared after accessing it!
@@ -70,7 +72,8 @@ def redirect_view(request, shortcode):
         url_mapping_object = UrlMapping.objects.get(shortcode=shortcode)
     except UrlMapping.DoesNotExist:
         print("No record found! Returning to the main page.")
-        messages.error(request, shortcode) # Passing the invalid shortcode to the main page to display an error message
+        if shortcode != "favicon.ico": 
+            messages.error(request, shortcode) # Passing the invalid shortcode to the main page to display an error message
         return redirect("/")
 
 

@@ -5,11 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
+    <link rel="stylesheet" href="{% static './styles.css' %}">
 </head>
 <body>
-    <h1>Welcome to the URL Shortener Service</h1>
+    <div>
+        <div>
+            <div>
+                <h1 id="mainHeader">Welcome to the URL Shortener Service</h1>
+            </div>
+            <img src="{% static './url_icon.png'}" alt="Url Icon">
+        </div>
+    </div>
     {% if shortcode %}
-        <p>Incorrect shortcode: {{ shortcode }}</p>
+        <p id="incorrectShortcodeMsg">Incorrect shortcode: {{ shortcode }}</p>
     {% endif %}
     <div>
         <input id="userInput">
@@ -17,6 +25,9 @@
     </div>
     <div>
         <a id="shortUrl"></a>
+    </div>
+    <div>
+        <p id="errorMessage"></p>
     </div>
     <script src="{% static './main.js' %}"></script>
 </body>
