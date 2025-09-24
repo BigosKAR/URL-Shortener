@@ -3,13 +3,19 @@
 	src: url("./Elure-woA9w.otf") format('opentype');
 }
 
+body {
+	margin:0px;
+}
+
 #mainTitleContainer {
 	display: flex;
 	justify-content: space-between;
-	padding-top: 100px;
 	margin: auto;
-	padding-left: 25%;
+	padding-top:5%;
+	padding-left:25%;
 	padding-right: 25%;
+	padding-bottom: 5%;
+	background-color: #e9f2ff;
 }
 
 #mainTitleSubContainer {
@@ -138,3 +144,49 @@
 }
 
 
+#urlsContainerWrapper {
+	margin-left: 15%;
+	margin-right: 15%;
+	background-color: white;
+	padding-top:5%;
+	padding-bottom:5%;
+
+}
+
+#latestUrlsContainer {
+	margin-left: 15%;
+	margin-right: 15%;
+	border-color:#1c7fff;
+	border-style: solid;
+	border-radius: 10px;
+	align-items: center;
+	justify-content: center;
+	padding-bottom:50px;
+	padding-top:25px;
+	padding-left: 50px;
+	padding-right: 50px;
+	background-color: #e9f2ff;
+}
+
+#latestUrlsTable {
+	margin-left: auto;
+	margin-right: auto;
+	font-family: 'Elure';
+	background-color:white;
+	border-color: #1c7fff;
+	border-style: solid;
+	border-radius: 10px;
+	padding: 10px;
+}
+
+th, td {
+	padding: 10px;
+	border: 1px solid #1c7fff;
+}
+
+#latestUrlsText {
+	text-align: center;
+	margin-bottom: 25px;
+	font-family: 'Elure';
+	font-size:40px;
+}

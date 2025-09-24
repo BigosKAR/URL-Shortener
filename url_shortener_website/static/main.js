@@ -53,9 +53,6 @@ shortenButton.addEventListener("click", () => {
 //             
         // };
     }
-    else{
-        alert("No input found.")
-    }
 })
 
 copyButton.addEventListener("click", () => {

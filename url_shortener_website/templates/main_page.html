@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
     <link rel="stylesheet" href="{% static './styles.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static './website_icon.png' %}">
 </head>
 <body>
     <div id="mainTitleContainer">
@@ -37,12 +38,23 @@
         </div>
         <img src="{% static 'url_icon.png' %}">
     </div>
-    {% for shortcode, original_url in latest_urls.items %}
-        <p>{{shortcode}}: {{original_url}}</p>
-    {% endfor %}
-
-    <p>{{ latest_urls }}</p>
-
+    <div id="urlsContainerWrapper">
+        <div id="latestUrlsContainer">
+                <h3 id="latestUrlsText">Recently created short URLs</h3>
+            <table id="latestUrlsTable">
+                <tr>
+                    <th>Short URL</th>
+                    <th>Redirects to:</th>
+                </tr>
+                    {% for shortcode, original_url in latest_urls.items %}
+                <tr>
+                    <td><a href="http://127.0.0.1:8000/{{shortcode}}">http://127.0.0.1:8000/{{shortcode}}</a></td>
+                    <td><a href="{{ original_url }}">{{ original_url }}</a></td>
+                </tr>
+                    {% endfor %}
+            </table>
+        </div>
+    </div>
     <script src="{% static './main.js' %}"></script>
 </body>
 </html>

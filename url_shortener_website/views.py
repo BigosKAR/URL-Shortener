@@ -65,7 +65,7 @@ def url_shortener_view(request):
         # Storage is cleared after accessing it!
         print("SHORTCODE FOUND!")
 
-    latest_urls = UrlMapping.objects.order_by("-id").values()[:5]
+    latest_urls = UrlMapping.objects.order_by("-id").values()[:10]
     url_json = {}
 
     for url in latest_urls:
