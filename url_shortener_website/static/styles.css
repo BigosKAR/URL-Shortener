@@ -47,6 +47,7 @@
 	font-size: 25px;
 	border-radius: 10px;
 	padding: 10px;
+	margin-top: 10px;
 }
 
 #shortenButton:hover {
@@ -106,3 +107,34 @@
 	height: 25px;
 	width: 25px;
 }
+
+#errorContainer, #incorrectShortcodeContainer {
+	width: 500px;
+	border-style: solid;
+	background-color: white;
+	border-color: red;
+	padding: 10px;
+	border-radius: 10px;
+	display: none;
+	height: 40px;
+  	justify-content: center;
+  	align-items: center;
+	transition-duration: 0.4s;
+}
+
+#errorMessage {
+	font-family: 'Elure';
+	font-size: 20px;
+}
+
+#errorContainer:hover, #incorrectShortcodeContainer:hover {
+	background-color: red;
+	color: white;
+}
+
+#incorrectShortcodeMsg {
+	font-family: 'Elure';
+	font-size: 20px;
+}
+
+

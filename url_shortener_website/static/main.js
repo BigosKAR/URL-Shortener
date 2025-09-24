@@ -6,10 +6,13 @@ shortenButton.addEventListener("click", () => {
     if(userInput.value !== ""){
         // defining elements we will change
         let displayErrorElement = document.getElementById("errorMessage");
+        let errorContainer = document.getElementById("errorContainer")
+
         let displayShortUrlContainer = document.getElementById("shortUrlContainer");
         let displayShortUrlElement = document.getElementById("shortUrl");
-        let displayIncorrectShortcodeElement = document.getElementById("incorrectShortcodeMsg")
-        
+
+        let displayIncorrectShortcodeElement = document.getElementById("incorrectShortcodeContainer")
+
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "http://127.0.0.1:8000/api/generate_shortcode");
         xhr.setRequestHeader("Content-type", "application/json")
@@ -29,19 +32,20 @@ shortenButton.addEventListener("click", () => {
                 displayShortUrlElement.innerHTML = responseJSON.success;
 
                 // Delete any previous errors
-                displayErrorElement.innerHTML = "";
-
-                displayIncorrectShortcodeElement.hidden = true
+                
+                errorContainer.style.display = "none";
+                displayIncorrectShortcodeElement.style.display = 'none';
             }
             else if(xhr.status === 400){
                 const responseJSON = JSON.parse(xhr.response)
                 displayErrorElement.innerHTML = responseJSON.error;
 
-                // Delete any previous successes
-                displayShortUrlElement.href = "";
-                displayShortUrlElement.innerHTML = "";
+                errorContainer.style.display = "flex";
 
-                displayIncorrectShortcodeElement.hidden = true
+                // Delete any previous successes or errors
+
+                displayIncorrectShortcodeElement.style.display = 'none';
+                displayShortUrlContainer.style.display = "none";
 
             }       
         };

@@ -32,7 +32,7 @@ def generate_shortcode(request):
     # Validating the URL
     
     if not validators.url(url):
-        return Response({"error": f"Invalid URL has been provided: {url}"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": f"Invalid URL has been provided! Try Again."}, status=status.HTTP_400_BAD_REQUEST)
     print("Validation passed. Moving on to DB entry creation.")
 
     print("Creating a new entry for the URL")
@@ -47,6 +47,7 @@ def generate_shortcode(request):
     print(f"The Base 62 encoded version: {new_entry.shortcode}")
 
     return Response({"success": f"{BASE_URL}/{new_entry.shortcode}"}, status=status.HTTP_201_CREATED)
+
 
 # Views related to the website itself
 
@@ -63,6 +64,15 @@ def url_shortener_view(request):
             context['shortcode'] = message
         # Storage is cleared after accessing it!
         print("SHORTCODE FOUND!")
+
+    latest_urls = UrlMapping.objects.order_by("-id").values()[:5]
+    url_json = {}
+
+    for url in latest_urls:
+        url_json[url['shortcode']] = url['original_url']
+
+    context['latest_urls'] = url_json
+
 
     return render('./templates/main_page.html', template_name="main_page.html", context=context)
 

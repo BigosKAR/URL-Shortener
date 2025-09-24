@@ -25,16 +25,24 @@
                     <a id="shortUrl"></a>
                     <button id="copyButton"><img id="copyImage" src="{% static 'copy_icon.png' %}"></button>
                 </div>
-                <div>
+                <div id="errorContainer">
                     <p id="errorMessage"></p>
                 </div>
+                {% if shortcode %}
+                <div id="incorrectShortcodeContainer" style="display:flex;">
+                    <p id="incorrectShortcodeMsg">Incorrect shortcode: {{ shortcode }}</p>
+                </div>   
+                {% endif %}
             </div>
         </div>
         <img src="{% static 'url_icon.png' %}">
     </div>
-    {% if shortcode %}
-        <p id="incorrectShortcodeMsg">Incorrect shortcode: {{ shortcode }}</p>
-    {% endif %}
+    {% for shortcode, original_url in latest_urls.items %}
+        <p>{{shortcode}}: {{original_url}}</p>
+    {% endfor %}
+
+    <p>{{ latest_urls }}</p>
+
     <script src="{% static './main.js' %}"></script>
 </body>
 </html>
