@@ -12,8 +12,11 @@
         <p>Incorrect shortcode: {{ shortcode }}</p>
     {% endif %}
     <div>
-        <input type="number" id="userInput">
+        <input id="userInput">
         <button type="button" id="shortenButton">Shorten!</button>
+    </div>
+    <div>
+        <a id="shortUrl"></a>
     </div>
     <script src="{% static './main.js' %}"></script>
 </body>
