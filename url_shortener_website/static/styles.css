@@ -12,8 +12,8 @@ body {
 	justify-content: space-between;
 	margin: auto;
 	padding-top:5%;
-	padding-left:25%;
-	padding-right: 25%;
+	padding-left:20%;
+	padding-right: 20%;
 	padding-bottom: 5%;
 	background-color: #e9f2ff;
 }
@@ -48,7 +48,7 @@ body {
 	transition-duration: 0.4s;
 	color: #1c7fff;
 	background-color: white;
-	width: 125px;
+	width: 20%;
 	border-color: #1c7fff;
 	font-size: 25px;
 	border-radius: 10px;
@@ -64,7 +64,7 @@ body {
 }
 
 #userInput {
-	width: 500px;
+	width: 60%;
 	border-radius: 10px;
 	padding: 10px;
 	border-color: #1c7fff;

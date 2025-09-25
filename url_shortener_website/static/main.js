@@ -16,11 +16,9 @@ shortenButton.addEventListener("click", () => {
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "http://127.0.0.1:8000/api/generate_shortcode");
         xhr.setRequestHeader("Content-type", "application/json")
-        console.log(userInput.value)
         const body = JSON.stringify({
             url: userInput.value,
         });
-        console.log(body)
         xhr.send(body);
         xhr.onload = () => {
             if(xhr.status === 200 || xhr.status === 201){
@@ -32,21 +30,19 @@ shortenButton.addEventListener("click", () => {
                 displayShortUrlElement.innerHTML = responseJSON.success;
 
                 // Delete any previous errors
-                
+                if (displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none'; // Shortcode might or might not exit!
                 errorContainer.style.display = "none";
-                displayIncorrectShortcodeElement.style.display = 'none';
             }
             else if(xhr.status === 400){
                 const responseJSON = JSON.parse(xhr.response)
                 displayErrorElement.innerHTML = responseJSON.error;
 
                 errorContainer.style.display = "flex";
-
                 // Delete any previous successes or errors
 
-                displayIncorrectShortcodeElement.style.display = 'none';
-                displayShortUrlContainer.style.display = "none";
 
+                displayShortUrlContainer.style.display = "none";
+                if (displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none';
             }       
         };
 //         xhr.onerror = function() { // only triggers if the request couldn't be made at all
