@@ -12,21 +12,17 @@ body {
 	justify-content: space-between;
 	margin: auto;
 	padding-top:5%;
-	padding-left:20%;
-	padding-right: 20%;
-	padding-bottom: 2%;
+	padding-left:25%;
+	padding-right: 25%;
+	padding-bottom: 5%;
 	background-color: #e9f2ff;
 }
 
-#outputContainer {
-	padding-top:1%;
-	padding-left:25%;
-	padding-right: 25%;
-	padding-bottom: 1%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background-color: #e9f2ff;
+#mainTitleSubContainer {
+
+}
+
+#mainTitleText {
 
 }
 
@@ -68,6 +64,7 @@ body {
 }
 
 #userInput {
+	width: 60%;
 	width: 60%;
 	border-radius: 10px;
 	padding: 10px;
