@@ -46,6 +46,7 @@
       </div>
       {% endif %}
     </div>
+    {% if latest_urls %}
     <div id="urlsContainerWrapper">
       <div id="latestUrlsContainer">
         <h3 id="latestUrlsText">Recently created short URLs</h3>
@@ -67,6 +68,13 @@
         </table>
       </div>
     </div>
+    {% else %}
+        <div id="urlsContainerWrapper">
+        <div id="latestUrlsContainer">
+            <h3 id="latestUrlsText">Here you will see recently created URLs!</h3>
+        </div>
+        </div>
+    {% endif %}
     <script src="{% static './main.js' %}"></script>
   </body>
 </html>
