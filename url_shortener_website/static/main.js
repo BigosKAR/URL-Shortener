@@ -32,7 +32,6 @@ shortenButton.addEventListener("click", () => {
                 // Delete any previous errors
                 if (displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none'; // Shortcode might or might not exit!
                 errorContainer.style.display = "none";
-                if(displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none';
             }
             else if(xhr.status === 400){
                 const responseJSON = JSON.parse(xhr.response)
@@ -43,7 +42,6 @@ shortenButton.addEventListener("click", () => {
 
                 if(displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none';
                 displayShortUrlContainer.style.display = "none";
-                if (displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none';
             }       
         };
 //         xhr.onerror = function() { // only triggers if the request couldn't be made at all
