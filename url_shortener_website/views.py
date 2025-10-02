@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import base62
 import validators
+from .utils import LatestUrlFactory
 
 DEFAULT_SHORTCODE = '.' # some character that does not collide with the base 62 output
 BASE_URL = 'http://127.0.0.1:8000'
@@ -20,14 +21,6 @@ def generate_shortcode(request):
         return Response({"error": "No URL provided."}, status=status.HTTP_400_BAD_REQUEST)
 
     url = body['url']
-    # Check for database entries
-    try:
-        url_object = UrlMapping.objects.get(original_url=url)
-        if url_object is not None:
-            print("This URL is already stored in the database.")
-            return Response({"success": f"{BASE_URL}/{url_object.shortcode}"}, status=status.HTTP_200_OK)
-    except UrlMapping.DoesNotExist:
-        print("No entry found for this link! Moving on to URL validation.")
 
     # Validating the URL
     
@@ -35,18 +28,26 @@ def generate_shortcode(request):
         return Response({"error": f"Invalid URL has been provided! Try Again."}, status=status.HTTP_400_BAD_REQUEST)
     print("Validation passed. Moving on to DB entry creation.")
 
-    print("Creating a new entry for the URL")
-    # Adding entry to the database
-    UrlMapping.objects.create(shortcode=DEFAULT_SHORTCODE, original_url=url)
+    # Adding or Finding an entry
+    try:
+        entry, created = UrlMapping.objects.get_or_create(
+            original_url=url
+        )
+    except UrlMapping.MultipleObjectsReturned:
+        print("Multiple objects found for the given shortcode and url!")
+        return Response({"error": "Multiple objects found for the given URL and shortcode!"})
 
-    # Getting the newly created entry to update the shortcode
-    new_entry = UrlMapping.objects.get(original_url=url)
-    new_entry.shortcode = base62.encode(new_entry.id)
-    new_entry.save()
-    print(f"New Entry ID: {new_entry.id}")
-    print(f"The Base 62 encoded version: {new_entry.shortcode}")
+    if created:
+        # Getting the newly created entry to update the shortcode
+        entry.shortcode = base62.encode(entry.id)
+        entry.save()
+    else:
+        return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status.HTTP_200_OK)
 
-    return Response({"success": f"{BASE_URL}/{new_entry.shortcode}"}, status=status.HTTP_201_CREATED)
+    print(f"New Entry ID: {entry.id}")
+    print(f"The Base 62 encoded version: {entry.shortcode}")
+
+    return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status.HTTP_201_CREATED)
 
 
 # Views related to the website itself
@@ -65,13 +66,7 @@ def url_shortener_view(request):
         # Storage is cleared after accessing it!
         print("SHORTCODE FOUND!")
 
-    latest_urls = UrlMapping.objects.order_by("-id").values()[:10]
-    url_json = {}
-
-    for url in latest_urls:
-        url_json[url['shortcode']] = url['original_url']
-
-    context['latest_urls'] = url_json
+    context['latest_urls'] = LatestUrlFactory(latest_url_amount=10).fetch_urls()
 
 
     return render('./templates/main_page.html', template_name="main_page.html", context=context)

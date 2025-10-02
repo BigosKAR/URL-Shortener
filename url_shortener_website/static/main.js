@@ -34,7 +34,7 @@ shortenButton.addEventListener("click", () => {
                 // Delete any previous errors
                 
                 errorContainer.style.display = "none";
-                displayIncorrectShortcodeElement.style.display = 'none';
+                if(displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none';
             }
             else if(xhr.status === 400){
                 const responseJSON = JSON.parse(xhr.response)
@@ -44,7 +44,7 @@ shortenButton.addEventListener("click", () => {
 
                 // Delete any previous successes or errors
 
-                displayIncorrectShortcodeElement.style.display = 'none';
+                if(displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none';
                 displayShortUrlContainer.style.display = "none";
 
             }       
@@ -56,7 +56,6 @@ shortenButton.addEventListener("click", () => {
 })
 
 copyButton.addEventListener("click", () => {
-    console.log("HELLO")
     let shortUrlElement = document.getElementById("shortUrl");
     navigator.clipboard.writeText(shortUrlElement.innerHTML);
 
