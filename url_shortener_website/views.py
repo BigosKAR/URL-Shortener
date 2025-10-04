@@ -6,15 +6,23 @@ from rest_framework.response import Response
 from rest_framework import status
 import base62
 import validators
-from .utils import LatestUrlFactory
+from .utils import LatestUrls
 
-DEFAULT_SHORTCODE = '.' # some character that does not collide with the base 62 output
 BASE_URL = 'http://127.0.0.1:8000'
 
 # Views related to the REST API
 
 @api_view(['POST'])
 def generate_shortcode(request):
+    """
+    
+    This function is responsible for fetching the url from the request body and then generating a short URL.
+    After the request body has been fetched, the program checks for the validity of the body.
+    It checks if the entry with the URL already exists, and creates it otherwise.
+    
+    In the case of creating a new entry, the shortcode is generated from encoding the id with base62 encoding.
+
+    """
     # url = request.POST.get('url', None)
     body = request.data
     if len(body) == 0:
@@ -53,6 +61,14 @@ def generate_shortcode(request):
 # Views related to the website itself
 
 def url_shortener_view(request):
+    """
+    
+    This view is responsible for loading the main page of the web app.
+    If a shortcode is passed (through FallbackStorage), it means it is an invalid shortcode and will be displayed on the website.
+
+    The latest URLs are also passed to the template to be displayed on the site.
+
+    """
     context = {}
     saved_messages = messages.get_messages(request)
 
@@ -66,13 +82,19 @@ def url_shortener_view(request):
         # Storage is cleared after accessing it!
         print("SHORTCODE FOUND!")
 
-    context['latest_urls'] = LatestUrlFactory(latest_url_amount=10).fetch_urls()
+    context['latest_urls'] = LatestUrls().get(amount=10)
 
 
     return render('./templates/main_page.html', template_name="main_page.html", context=context)
 
 # Create your views here.
 def redirect_view(request, shortcode):
+    """
+    
+    Responsible for redirecting to a specific website based on the shortcode.
+    If an invalid shortcode is provided, it will be redirect the user to the main page. (Saves the shortcode in the FallbackStorage)
+
+    """
     try:
         url_mapping_object = UrlMapping.objects.get(shortcode=shortcode)
     except UrlMapping.DoesNotExist:

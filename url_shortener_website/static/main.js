@@ -2,6 +2,12 @@ let shortenButton = document.getElementById("shortenButton")
 let copyButton = document.getElementById("copyButton")
 
 shortenButton.addEventListener("click", () => {
+    /**
+     * This function is responsible for the button logic of the website.
+     * The frontend will send a request to the REST API endpoint that will return a shortened URL in the case of a success and edit all the necessary styling.
+     * 
+     * The same goes for failure. The site will be updated appropriately and display the error message.
+     */
     let userInput = document.getElementById("userInput")
     if(userInput.value !== ""){
         // defining elements we will change
@@ -51,6 +57,9 @@ shortenButton.addEventListener("click", () => {
 })
 
 copyButton.addEventListener("click", () => {
+    /**
+     * Responsible for button logic for copying the shortened URL.
+     */
     let shortUrlElement = document.getElementById("shortUrl");
     navigator.clipboard.writeText(shortUrlElement.innerHTML);
 
