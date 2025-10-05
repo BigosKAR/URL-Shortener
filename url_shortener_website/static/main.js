@@ -50,9 +50,6 @@ shortenButton.addEventListener("click", () => {
                 displayShortUrlContainer.style.display = "none";
             }       
         };
-//         xhr.onerror = function() { // only triggers if the request couldn't be made at all
-//             
-        // };
     }
 })
 

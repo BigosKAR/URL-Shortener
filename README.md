@@ -74,6 +74,8 @@ To run the server, execute:
     python manage.py runserver
 ```
 
+I recommend adding a few URLs and then hitting f5 to see them in the latest URLs section.
+
 ## AI Usage
 This repository does not contain AI-Generated code. 
 
