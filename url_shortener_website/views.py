@@ -1,13 +1,21 @@
 from django.shortcuts import render, redirect
 from .models import UrlMapping
 from django.contrib import messages # Only one message should be in the storage at all times!
-from .utils import LatestUrlFactory
+from .utils import LatestUrls
 
 DEFAULT_SHORTCODE = '.' # some character that does not collide with the base 62 output
 
 # Views related to the website itself
 
 def url_shortener_view(request):
+    """
+    
+    This view is responsible for loading the main page of the web app.
+    If a shortcode is passed (through FallbackStorage), it means it is an invalid shortcode and will be displayed on the website.
+
+    The latest URLs are also passed to the template to be displayed on the site.
+
+    """
     context = {}
     saved_messages = messages.get_messages(request)
 
@@ -21,13 +29,19 @@ def url_shortener_view(request):
         # Storage is cleared after accessing it!
         print("SHORTCODE FOUND!")
 
-    context['latest_urls'] = LatestUrlFactory(latest_url_amount=10).fetch_urls()
+    context['latest_urls'] = LatestUrls().get(amount=10)
 
 
     return render('./templates/main_page.html', template_name="main_page.html", context=context)
 
 # Create your views here.
 def redirect_view(request, shortcode):
+    """
+    
+    Responsible for redirecting to a specific website based on the shortcode.
+    If an invalid shortcode is provided, it will be redirect the user to the main page. (Saves the shortcode in the FallbackStorage)
+
+    """
     try:
         url_mapping_object = UrlMapping.objects.get(shortcode=shortcode)
     except UrlMapping.DoesNotExist:
