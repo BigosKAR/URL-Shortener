@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import *
+from .api.views import *
 
 urlpatterns = [
     path('', url_shortener_view),

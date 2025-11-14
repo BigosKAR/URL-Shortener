@@ -13,6 +13,14 @@
     />
   </head>
   <body>
+    <div>
+      <nav id="topNav">
+        <ul>
+          <li><button id="loginBtn">Login</button></li>
+          <li><button id="signupBtn">Sign Up</button></li>
+        </ul>
+      </nav>
+    </div>
     <div id="mainTitleContainer">
       <div id="mainTitleSubContainer">
         <h1 id="mainHeader">URL Shortener</h1>
@@ -75,6 +83,47 @@
         </div>
         </div>
     {% endif %}
+    <!-- Auth modal overlay -->
+    <div id="authOverlay" class="auth-overlay" role="dialog" aria-hidden="true">
+      <div class="auth-box" id="authBox">
+        <button id="authClose" class="auth-close" aria-label="Close">✕</button>
+
+        <div id="loginForm" class="auth-form" style="display:none;">
+          <h2>Login</h2>
+          <form id="loginFormElement" action="#">
+            <label for="loginEmail">Email</label>
+            <input id="loginEmail" type="email" required />
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password" required />
+            <div class="auth-actions">
+              <a href="#" id="forgotPassword">Forgot Password?</a>
+              <button type="submit" class="primary-btn">Login</button>
+            </div>
+            <p>Don't have an account? <a href="#" id="showSignup">Sign up</a></p>
+          </form>
+        </div>
+
+        <div id="signUpForm" class="auth-form" style="display:none;">
+          <h2>Sign Up</h2>
+          <form id="signupFormElement" action="#">
+            <label for="signupName">Name</label>
+            <input id="signupName" type="text" required />
+            <label for="signupEmail">Email</label>
+            <input id="signupEmail" type="email" required />
+            <label for="signupPassword">Password</label>
+            <input id="signupPassword" type="password" required />
+            <label for="signupPasswordConfirm">Confirm Password</label>
+            <input id="signupPasswordConfirm" type="password" required />
+            <div class="auth-actions" style="justify-content:flex-end;">
+              <button type="submit" class="primary-btn">Create account</button>
+            </div>
+            <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
     <script src="{% static './main.js' %}"></script>
   </body>
 </html>
