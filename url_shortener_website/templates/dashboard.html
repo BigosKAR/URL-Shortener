@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{% static './styles.css' %}" />
+  </head>
+  <body>
+    <nav class="dashboard-nav">
+      <a href="/">Home</a>
+    </nav>
+    <main class="dashboard-main">
+      <div class="dashboard-container">
+        <h1>Dashboard</h1>
+        <div class="dashboard-card">
+          <p>This is a placeholder dashboard. Replace with user-specific content.</p>
+        </div>
+        <h3>Your URLs</h3>
+        <table class="dashboard-table">
+          <thead>
+            <tr><th>Short URL</th><th>Destination</th><th>Clicks</th></tr>
+          </thead>
+          <tbody>
+            {% for url, url_specs in user_urls.items %}
+            <tr>
+                <td>
+                <a href="{{ url_specs.shortened_url }}"
+                    >{{ url_specs.shortened_url }}</a
+                >
+                </td>
+                <td><a href="{{ url_specs.original_url }}">{{ url_specs.original_url }}</a></td>
+                <td><p>{{ url_specs.clicks }}</p></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>

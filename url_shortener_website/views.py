@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import UrlMapping
 from django.contrib import messages # Only one message should be in the storage at all times!
-from .utils import LatestUrls
+from .utils import UrlFetcher
 
 DEFAULT_SHORTCODE = '.' # some character that does not collide with the base 62 output
 
@@ -29,7 +29,7 @@ def url_shortener_view(request):
         # Storage is cleared after accessing it!
         print("SHORTCODE FOUND!")
 
-    context['latest_urls'] = LatestUrls().get(amount=10)
+    context['latest_urls'] = UrlFetcher().get_latest(amount=10)
 
 
     return render('./templates/main_page.html', template_name="main_page.html", context=context)
@@ -44,6 +44,8 @@ def redirect_view(request, shortcode):
     """
     try:
         url_mapping_object = UrlMapping.objects.get(shortcode=shortcode)
+        url_mapping_object.clicks += 1
+        url_mapping_object.save()
     except UrlMapping.DoesNotExist:
         print("No record found! Returning to the main page.")
         if shortcode != "favicon.ico": 
@@ -54,3 +56,20 @@ def redirect_view(request, shortcode):
     original_url = url_mapping_object.original_url
     print(f"[{shortcode}] - Redirecting to the following website: {original_url}")
     return redirect(original_url)
+
+
+def dashboard_view(request):
+    """Simple dashboard page placeholder.
+
+    This view shows a basic dashboard template. Replace with real
+    user-specific data after implementing authentication/session logic.
+    """
+    # Protect the dashboard: only allow when session contains user_id
+    user_id = request.session.get('user_id')
+    if not user_id:
+        # Not authenticated -- redirect to main page
+        return redirect('/')
+
+    context = {}
+    context['user_urls'] = UrlFetcher().get_info(user_id)
+    return render('./templates/dashboard.html', template_name='dashboard.html', context=context)

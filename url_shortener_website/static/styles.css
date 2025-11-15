@@ -78,6 +78,10 @@ ul li button:hover {
 /* Ensure forms don't expand the page and have good spacing */
 .auth-form { padding-bottom: 6px }
 
+.form-message{ display:none; padding:8px 10px; border-radius:6px; margin-top:8px; font-size:13px }
+.form-message.error{ background:#ffecec; color:#a90000; border:1px solid #f5c6c6 }
+.form-message.success{ background:#e6ffef; color:#006b3a; border:1px solid #bfe9c8 }
+
 @media (max-width: 420px){
 	.auth-box{ width: calc(100% - 24px); left: 12px; right: 12px }
 }
@@ -194,6 +198,16 @@ ul li button:hover {
 	width: 25px;
 }
 
+#downloadQrBtn{
+	background:#fff;
+	color:#1c7fff;
+	border:1px solid #1c7fff;
+	border-radius:8px;
+	padding:8px 10px;
+	cursor:pointer;
+}
+#downloadQrBtn:hover{ background:#1c7fff; color:#fff }
+
 #errorContainer, #incorrectShortcodeContainer {
 	width: 50%;
 	border-style: solid;
@@ -269,4 +283,65 @@ th, td {
 	margin-bottom: 25px;
 	font-family: 'Elure';
 	font-size:40px;
+}
+
+/* Dashboard styles - match main page design */
+nav.dashboard-nav, nav {
+	background-color: #1c7fff;
+	padding: 12px 16px;
+}
+nav.dashboard-nav a, nav a {
+	color: white;
+	font-family: 'Elure';
+	text-decoration: none;
+	padding: 8px 12px;
+	display: inline-block;
+}
+
+main.dashboard-main{
+	background-color: #e9f2ff;
+	padding: 48px 12%;
+	min-height: calc(100vh - 80px);
+}
+
+.dashboard-container{
+	max-width: 1000px;
+	margin: 0 auto;
+	background: white;
+	border: 1px solid #1c7fff;
+	border-radius: 10px;
+	padding: 28px;
+	box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+.dashboard-container h1{
+	font-family: 'Elure';
+	font-size: 36px;
+	margin-top: 0;
+}
+
+.dashboard-actions{
+	display:flex;
+	gap:12px;
+	margin-bottom: 18px;
+}
+
+.dashboard-card{
+	border: 1px solid #e6eefc;
+	padding: 16px;
+	border-radius: 8px;
+	margin-bottom: 12px;
+	background: #fbfdff;
+}
+
+.dashboard-table{
+	width:100%;
+	border-collapse: collapse;
+	margin-top: 8px;
+}
+.dashboard-table th, .dashboard-table td{ padding:10px; border:1px solid #1c7fff }
+
+@media (max-width: 800px){
+	main.dashboard-main{ padding-left: 6%; padding-right: 6%; }
+	.dashboard-actions{ flex-direction: column; align-items: stretch }
 }

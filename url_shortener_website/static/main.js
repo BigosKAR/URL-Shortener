@@ -12,6 +12,8 @@ const signUpFormBox = document.getElementById("signUpForm");
 const showSignupLink = document.getElementById("showSignup");
 const showLoginLink = document.getElementById("showLogin");
 
+const BASE_URL = "http://127.0.0.1:8000"
+
 function openAuth(which, anchorEl){
     // show overlay (prevents page interaction)
     if(!authOverlay) return;
@@ -68,33 +70,124 @@ if(authOverlay) authOverlay.addEventListener('click', (e)=>{ if(e.target === aut
 if(showSignupLink) showSignupLink.addEventListener('click', (e)=>{ e.preventDefault(); openAuth('signup', signupBtn || loginBtn); });
 if(showLoginLink) showLoginLink.addEventListener('click', (e)=>{ e.preventDefault(); openAuth('login', loginBtn || signupBtn); });
 
-// simple signup client-side validation
+
 const signupFormElement = document.getElementById('signupFormElement');
+const loginFormElement = document.getElementById('loginFormElement');
+// form message helpers and auth state
+const signupMessageEl = document.getElementById('signupMessage');
+const loginMessageEl = document.getElementById('loginMessage');
+const dashboardBtn = document.getElementById('dashboardBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const downloadQrBtn = document.getElementById('downloadQrBtn');
+
+function showFormMessage(el, msg, isError=false){
+    if(!el) return;
+    el.textContent = msg;
+    el.style.display = 'block';
+    el.className = 'form-message ' + (isError ? 'error' : 'success');
+}
+
+function clearFormMessage(el){ if(!el) return; el.textContent=''; el.style.display='none'; el.className='form-message'; }
+
+function updateNavForLoggedIn(){
+    const loggedIn = localStorage.getItem('loggedIn') === 'true';
+    if(loggedIn){
+        if(loginBtn) loginBtn.style.display = 'none';
+        if(signupBtn) signupBtn.style.display = 'none';
+        if(logoutBtn) logoutBtn.style.display = 'block';
+        if(dashboardBtn) dashboardBtn.style.display = 'block';
+    } else {
+        if(loginBtn) loginBtn.style.display = 'block';
+        if(signupBtn) signupBtn.style.display = 'block';
+        if(logoutBtn) logoutBtn.style.display = 'none';
+        if(dashboardBtn) dashboardBtn.style.display = 'none';
+    }
+}
+
+// signup submission (AJAX)
 if(signupFormElement){
-    signupFormElement.addEventListener('submit', (e)=>{
+    signupFormElement.addEventListener('submit', async (e)=>{
         e.preventDefault();
-        const pw = document.getElementById('signupPassword').value;
-        const pw2 = document.getElementById('signupPasswordConfirm').value;
-        if(pw !== pw2){
-            alert('Passwords do not match');
+        clearFormMessage(signupMessageEl);
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
+        if(password !== passwordConfirm){
+            showFormMessage(signupMessageEl, 'Passwords do not match', true);
             return;
         }
-        // TODO: submit to backend endpoint
-        alert('Signup submitted (client-side).');
-        closeAuth();
+
+        try{
+            const resp = await fetch('/api/signup', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: email, password: password })
+            });
+            const data = await resp.json();
+            if(resp.status === 201){
+                showFormMessage(signupMessageEl, data.success || 'Account created. Please log in.', false);
+                // switch to login after short delay
+                setTimeout(()=>{ openAuth('login', loginBtn); clearFormMessage(signupMessageEl); }, 900);
+            } else {
+                showFormMessage(signupMessageEl, data.error || 'Signup failed', true);
+            }
+        } catch(err){
+            showFormMessage(signupMessageEl, 'Network error. Try again.', true);
+        }
     });
 }
 
-// simple login handler (client-side placeholder)
-const loginFormElement = document.getElementById('loginFormElement');
+// login submission (AJAX)
 if(loginFormElement){
-    loginFormElement.addEventListener('submit', (e)=>{
+    loginFormElement.addEventListener('submit', async (e)=>{
         e.preventDefault();
-        // TODO: submit to backend endpoint
-        alert('Login submitted (client-side).');
-        closeAuth();
+        clearFormMessage(loginMessageEl);
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
+        try{
+            const resp = await fetch(`/api/login`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email: email, password: password })
+            });
+            const data = await resp.json();
+            if(resp.status === 200){
+                // mark logged in locally (skeleton)
+                localStorage.setItem('loggedIn', 'true');
+                localStorage.setItem('userEmail', email);
+                updateNavForLoggedIn();
+                showFormMessage(loginMessageEl, data.success || 'Logged in', false);
+                setTimeout(()=>{ closeAuth(); clearFormMessage(loginMessageEl); }, 600);
+            } else {
+                showFormMessage(loginMessageEl, data.error || 'Login failed', true);
+            }
+        } catch(err){
+            showFormMessage(loginMessageEl, 'Network error. Try again.', true);
+        }
     });
 }
+
+// logout action - call server to clear session then update UI
+if(logoutBtn) logoutBtn.addEventListener('click', async ()=>{
+    try{
+        await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
+    } catch(e){ /* ignore network errors */ }
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('userEmail');
+    updateNavForLoggedIn();
+});
+
+// dashboard action (redirect to server-protected dashboard)
+if(dashboardBtn) dashboardBtn.addEventListener('click', ()=>{
+    window.location.href = '/user/dashboard';
+});
+
+// init nav on load
+updateNavForLoggedIn();
+
 
 shortenButton.addEventListener("click", () => {
     /**
@@ -115,7 +208,7 @@ shortenButton.addEventListener("click", () => {
         let displayIncorrectShortcodeElement = document.getElementById("incorrectShortcodeContainer")
 
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://127.0.0.1:8000/api/generate_shortcode");
+        xhr.open("POST", `${BASE_URL}/api/generate_shortcode`);
         xhr.setRequestHeader("Content-type", "application/json")
         const body = JSON.stringify({
             url: userInput.value,
@@ -129,6 +222,13 @@ shortenButton.addEventListener("click", () => {
 
                 displayShortUrlElement.href = responseJSON.success; 
                 displayShortUrlElement.innerHTML = responseJSON.success;
+
+                    // show download QR button (UI only - no implementation)
+                    if(downloadQrBtn){
+                        downloadQrBtn.style.display = 'inline-block';
+                        // store the shortcode/url for future implementation
+                        downloadQrBtn.dataset.shorturl = responseJSON.success;
+                    }
 
                 // Delete any previous errors
                 if (displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none'; // Shortcode might or might not exit!

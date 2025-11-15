@@ -16,6 +16,8 @@
     <div>
       <nav id="topNav">
         <ul>
+          <li><button id="logoutBtn" style="display:none;">Logout</button></li>
+          <li><button id="dashboardBtn" style="display:none;">Dashboard</button></li>
           <li><button id="loginBtn">Login</button></li>
           <li><button id="signupBtn">Sign Up</button></li>
         </ul>
@@ -44,6 +46,7 @@
         <button id="copyButton">
           <img id="copyImage" src="{% static 'copy_icon.png' %}" />
         </button>
+        <button id="downloadQrBtn" style="display:none; margin-left:8px;">Download QR</button>
       </div>
       <div id="errorContainer">
         <p id="errorMessage"></p>
@@ -95,6 +98,7 @@
             <input id="loginEmail" type="email" required />
             <label for="loginPassword">Password</label>
             <input id="loginPassword" type="password" required />
+            <div id="loginMessage" class="form-message" style="display:none"></div>
             <div class="auth-actions">
               <a href="#" id="forgotPassword">Forgot Password?</a>
               <button type="submit" class="primary-btn">Login</button>
@@ -106,14 +110,13 @@
         <div id="signUpForm" class="auth-form" style="display:none;">
           <h2>Sign Up</h2>
           <form id="signupFormElement" action="#">
-            <label for="signupName">Name</label>
-            <input id="signupName" type="text" required />
             <label for="signupEmail">Email</label>
             <input id="signupEmail" type="email" required />
             <label for="signupPassword">Password</label>
             <input id="signupPassword" type="password" required />
             <label for="signupPasswordConfirm">Confirm Password</label>
             <input id="signupPasswordConfirm" type="password" required />
+            <div id="signupMessage" class="form-message" style="display:none"></div>
             <div class="auth-actions" style="justify-content:flex-end;">
               <button type="submit" class="primary-btn">Create account</button>
             </div>
@@ -125,5 +128,6 @@
     </div>
 
     <script src="{% static './main.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
   </body>
 </html>

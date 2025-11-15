@@ -6,6 +6,7 @@ class UrlMapping(models.Model):
     id = models.BigAutoField(primary_key=True) # Support massive amounts of entry IDs (for example: 100 million new URLs every day)
     shortcode = models.CharField(unique=True)
     original_url = models.CharField(null=False, unique=True)
+    clicks = models.BigIntegerField(default=0)
 
 class UserAccount(models.Model):
     id = models.AutoField(primary_key=True)
