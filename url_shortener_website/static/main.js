@@ -191,7 +191,7 @@ if(dashboardBtn) dashboardBtn.addEventListener('click', ()=>{
 updateNavForLoggedIn();
 
 
-shortenButton.addEventListener("click", () => {
+shortenButton.addEventListener("click", async () => {
     /**
      * This function is responsible for the button logic of the website.
      * The frontend will send a request to the REST API endpoint that will return a shortened URL in the case of a success and edit all the necessary styling.
@@ -209,45 +209,46 @@ shortenButton.addEventListener("click", () => {
 
         let displayIncorrectShortcodeElement = document.getElementById("incorrectShortcodeContainer")
 
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", `${BASE_URL}/api/generate_shortcode`);
-        xhr.setRequestHeader("Content-type", "application/json")
         const body = JSON.stringify({
             url: userInput.value,
         });
-        xhr.send(body);
-        xhr.onload = () => {
-            if(xhr.status === 200 || xhr.status === 201){
-                const responseJSON = JSON.parse(xhr.response)
-                
-                displayShortUrlContainer.style.display = "flex";
+        const response = await fetch(`${BASE_URL}/api/generate_shortcode`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: body
+        });
+        const responseJSON = await response.json();
+        if(response.ok){
+            
+            displayShortUrlContainer.style.display = "flex";
 
-                displayShortUrlElement.href = responseJSON.success; 
-                displayShortUrlElement.innerHTML = responseJSON.success;
+            displayShortUrlElement.href = responseJSON.success; 
+            displayShortUrlElement.innerHTML = responseJSON.success;
 
-                    // show download QR button (UI only - no implementation)
-                    if(downloadQrBtn){
-                        downloadQrBtn.style.display = 'inline-block';
-                        // store the shortcode/url for future implementation
-                        downloadQrBtn.dataset.shorturl = responseJSON.success;
-                    }
+                // show download QR button (UI only - no implementation)
+                if(downloadQrBtn){
+                    downloadQrBtn.style.display = 'inline-block';
+                    // store the shortcode/url for future implementation
+                    downloadQrBtn.dataset.shorturl = responseJSON.success;
+                }
 
-                // Delete any previous errors
-                if (displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none'; // Shortcode might or might not exit!
-                errorContainer.style.display = "none";
-            }
-            else if(xhr.status === 400){
-                const responseJSON = JSON.parse(xhr.response)
-                displayErrorElement.innerHTML = responseJSON.error;
+            // Delete any previous errors
+            if (displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none'; // Shortcode might or might not exit!
+            errorContainer.style.display = "none";
+        }
+        else if(response.status === 400){
+            const responseJSON = JSON.parse(xhr.response)
+            displayErrorElement.innerHTML = responseJSON.error;
 
-                errorContainer.style.display = "flex";
-                // Delete any previous successes or errors
+            errorContainer.style.display = "flex";
+            // Delete any previous successes or errors
 
-                if(displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none';
-                displayShortUrlContainer.style.display = "none";
-            }       
-        };
-    }
+            if(displayIncorrectShortcodeElement !== null)displayIncorrectShortcodeElement.style.display = 'none';
+            displayShortUrlContainer.style.display = "none";
+        }       
+    };
 })
 
 copyButton.addEventListener("click", () => {

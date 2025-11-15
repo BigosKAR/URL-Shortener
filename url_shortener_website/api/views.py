@@ -102,10 +102,8 @@ def create_account(request):
     account = UserAccount(email=email, hashed_password=hashed)
     account.save()
 
-    # set session keys so the server recognizes the newly created user as logged in
     try:
         request.session['user_id'] = account.id
-        request.session['user_email'] = account.email
     except Exception:
         print("Warning: could not set session for new account")
 
@@ -135,9 +133,8 @@ def login_account(request):
 
     # set session keys so the server recognizes logged-in users
     try:
-        # DRF Request has a .session attribute when SessionMiddleware is enabled
+        # Using session variables to store credentials for the dashboard
         request.session['user_id'] = account.id
-        request.session['user_email'] = account.email
     except Exception:
         # if session can't be set, continue but warn
         print("Warning: could not set session for login")

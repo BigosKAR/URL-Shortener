@@ -3,7 +3,6 @@ from .api.views import BASE_URL
     
 class UrlFetcher():
     def get_info(self, id):
-        # Get URL ids associated with the user
         mappings = UserUrlMapping.objects.filter(user_id=id).values_list('url_id', flat=True)
         urls = UrlMapping.objects.filter(id__in=list(mappings))
 

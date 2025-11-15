@@ -44,6 +44,7 @@ def redirect_view(request, shortcode):
     """
     try:
         url_mapping_object = UrlMapping.objects.get(shortcode=shortcode)
+        # Updating clicks
         url_mapping_object.clicks += 1
         url_mapping_object.save()
     except UrlMapping.DoesNotExist:
@@ -59,15 +60,12 @@ def redirect_view(request, shortcode):
 
 
 def dashboard_view(request):
-    """Simple dashboard page placeholder.
-
-    This view shows a basic dashboard template. Replace with real
-    user-specific data after implementing authentication/session logic.
     """
-    # Protect the dashboard: only allow when session contains user_id
+    View designed to look at your own URLs to check statistics like click counters
+    """
     user_id = request.session.get('user_id')
     if not user_id:
-        # Not authenticated -- redirect to main page
+        print("Unauthorized access to dashboard.")
         return redirect('/')
 
     context = {}
