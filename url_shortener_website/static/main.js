@@ -126,9 +126,11 @@ if(signupFormElement){
             });
             const data = await resp.json();
             if(resp.status === 201){
-                showFormMessage(signupMessageEl, data.success || 'Account created. Please log in.', false);
-                // switch to login after short delay
-                setTimeout(()=>{ openAuth('login', loginBtn); clearFormMessage(signupMessageEl); }, 900);
+                showFormMessage(signupMessageEl, data.success || 'Account created.', false);
+                localStorage.setItem('loggedIn', 'true');
+                localStorage.setItem('userEmail', email);
+                updateNavForLoggedIn();
+                setTimeout(()=>{ closeAuth(); clearFormMessage(signupMessageEl); }, 600);
             } else {
                 showFormMessage(signupMessageEl, data.error || 'Signup failed', true);
             }
@@ -257,3 +259,84 @@ copyButton.addEventListener("click", () => {
 
     alert("Copied to the clipboard")
 })
+
+// Download QR button: generate QR code and download as PNG
+if(downloadQrBtn){
+    downloadQrBtn.addEventListener('click', async ()=>{
+        const url = document.getElementById('shortUrl')?.innerText;
+        if(!url){
+            alert('No URL available to generate QR.');
+            return;
+        }
+
+        // Ensure QRCode library is available; load from CDN if not
+        async function ensureQRCode(){
+            if(typeof QRCode !== 'undefined') return;
+            return new Promise((resolve, reject)=>{
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+                s.onload = () => resolve();
+                s.onerror = () => reject(new Error('Failed to load QRCode library'));
+                document.head.appendChild(s);
+            });
+        }
+
+        try{
+            await ensureQRCode();
+        } catch(err){
+            console.error(err);
+            alert('Unable to load QR generator.');
+            return;
+        }
+
+        // create temporary container
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.left = '-9999px';
+        document.body.appendChild(container);
+
+        // generate QR
+        try{
+            // QRCode constructor will render an <img> or <canvas> inside container
+            const qr = new QRCode(container, {
+                text: url,
+                width: 256,
+                height: 256,
+                colorDark : '#000000',
+                colorLight : '#ffffff',
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            // wait a tick for rendering
+            await new Promise(r => setTimeout(r, 100));
+
+            // find image or canvas
+            let dataUrl = null;
+            const img = container.querySelector('img');
+            const canvas = container.querySelector('canvas');
+            if(canvas && typeof canvas.toDataURL === 'function'){
+                dataUrl = canvas.toDataURL('image/png');
+            } else if(img && img.src){
+                dataUrl = img.src;
+            }
+
+            if(!dataUrl){
+                alert('Could not generate QR image.');
+                return;
+            }
+
+            // trigger download
+            const link = document.createElement('a');
+            const lastSegment = (url.split('/').filter(Boolean).pop() || 'qrcode');
+            const filename = `${lastSegment}.png`;
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } finally {
+            // cleanup
+            container.remove();
+        }
+    });
+}

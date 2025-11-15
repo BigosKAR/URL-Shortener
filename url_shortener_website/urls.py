@@ -10,5 +10,5 @@ urlpatterns = [
     path('api/generate_shortcode', generate_shortcode),
     path('api/signup', create_account),
     path('api/login', login_account),
-        path('api/logout', logout_account),
+    path('api/logout', logout_account),
 ]

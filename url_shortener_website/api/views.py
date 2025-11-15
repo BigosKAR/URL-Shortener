@@ -102,6 +102,13 @@ def create_account(request):
     account = UserAccount(email=email, hashed_password=hashed)
     account.save()
 
+    # set session keys so the server recognizes the newly created user as logged in
+    try:
+        request.session['user_id'] = account.id
+        request.session['user_email'] = account.email
+    except Exception:
+        print("Warning: could not set session for new account")
+
     return Response({"success": "Account created."}, status=status.HTTP_201_CREATED)
 
 

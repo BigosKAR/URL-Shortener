@@ -205,6 +205,7 @@ ul li button:hover {
 	border-radius:8px;
 	padding:8px 10px;
 	cursor:pointer;
+	font-family: 'Elure';
 }
 #downloadQrBtn:hover{ background:#1c7fff; color:#fff }
 
@@ -314,10 +315,14 @@ main.dashboard-main{
 	box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
-.dashboard-container h1{
+.dashboard-container h1, h3{
 	font-family: 'Elure';
 	font-size: 36px;
 	margin-top: 0;
+}
+
+h3{
+	font-size: 20px;
 }
 
 .dashboard-actions{
@@ -339,7 +344,11 @@ main.dashboard-main{
 	border-collapse: collapse;
 	margin-top: 8px;
 }
-.dashboard-table th, .dashboard-table td{ padding:10px; border:1px solid #1c7fff }
+.dashboard-table th, .dashboard-table td{ 
+	padding:10px; 
+	border:1px solid #1c7fff;
+	font-family: 'Elure';
+}
 
 @media (max-width: 800px){
 	main.dashboard-main{ padding-left: 6%; padding-right: 6%; }
