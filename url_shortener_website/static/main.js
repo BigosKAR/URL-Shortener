@@ -79,6 +79,7 @@ const loginMessageEl = document.getElementById('loginMessage');
 const dashboardBtn = document.getElementById('dashboardBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const downloadQrBtn = document.getElementById('downloadQrBtn');
+const downloadQrBtnDb = document.getElementById('downloadQrBtnDb');
 
 function showFormMessage(el, msg, isError=false){
     if(!el) return;
@@ -104,7 +105,7 @@ function updateNavForLoggedIn(){
     }
 }
 
-// signup submission (AJAX)
+// Sign up logic
 if(signupFormElement){
     signupFormElement.addEventListener('submit', async (e)=>{
         e.preventDefault();
@@ -140,7 +141,7 @@ if(signupFormElement){
     });
 }
 
-// login submission (AJAX)
+// Login logic
 if(loginFormElement){
     loginFormElement.addEventListener('submit', async (e)=>{
         e.preventDefault();
@@ -182,16 +183,29 @@ if(logoutBtn) logoutBtn.addEventListener('click', async ()=>{
     updateNavForLoggedIn();
 });
 
-// dashboard action (redirect to server-protected dashboard)
-if(dashboardBtn) dashboardBtn.addEventListener('click', ()=>{
-    window.location.href = '/user/dashboard';
+// dashboard action (only allow if user is logged in)
+if(dashboardBtn) dashboardBtn.addEventListener('click', async ()=>{
+    try{
+        const response = await fetch('/api/verify_session', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+        if(response.ok){
+            localStorage.setItem('loggedIn', 'true');
+            window.location.href = '/user/dashboard';
+        }
+    } catch{
+        localStorage.removeItem('loggedIn')
+        updateNavForLoggedIn();
+    }
 });
 
 // init nav on load
 updateNavForLoggedIn();
 
 
-shortenButton.addEventListener("click", async () => {
+if (shortenButton) {
+    shortenButton.addEventListener("click", async () => {
     /**
      * This function is responsible for the button logic of the website.
      * The frontend will send a request to the REST API endpoint that will return a shortened URL in the case of a success and edit all the necessary styling.
@@ -249,9 +263,11 @@ shortenButton.addEventListener("click", async () => {
             displayShortUrlContainer.style.display = "none";
         }       
     };
-})
+    })
+}
 
-copyButton.addEventListener("click", () => {
+if (copyButton) {
+    copyButton.addEventListener("click", () => {
     /**
      * Responsible for button logic for copying the shortened URL.
      */
@@ -259,7 +275,8 @@ copyButton.addEventListener("click", () => {
     navigator.clipboard.writeText(shortUrlElement.innerHTML);
 
     alert("Copied to the clipboard")
-})
+    })
+}
 
 // Download QR button: generate QR code and download as PNG
 if(downloadQrBtn){
@@ -267,26 +284,6 @@ if(downloadQrBtn){
         const url = document.getElementById('shortUrl')?.innerText;
         if(!url){
             alert('No URL available to generate QR.');
-            return;
-        }
-
-        // Ensure QRCode library is available; load from CDN if not
-        async function ensureQRCode(){
-            if(typeof QRCode !== 'undefined') return;
-            return new Promise((resolve, reject)=>{
-                const s = document.createElement('script');
-                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-                s.onload = () => resolve();
-                s.onerror = () => reject(new Error('Failed to load QRCode library'));
-                document.head.appendChild(s);
-            });
-        }
-
-        try{
-            await ensureQRCode();
-        } catch(err){
-            console.error(err);
-            alert('Unable to load QR generator.');
             return;
         }
 
@@ -298,7 +295,6 @@ if(downloadQrBtn){
 
         // generate QR
         try{
-            // QRCode constructor will render an <img> or <canvas> inside container
             const qr = new QRCode(container, {
                 text: url,
                 width: 256,
@@ -307,26 +303,20 @@ if(downloadQrBtn){
                 colorLight : '#ffffff',
                 correctLevel : QRCode.CorrectLevel.H
             });
-
             // wait a tick for rendering
             await new Promise(r => setTimeout(r, 100));
 
             // find image or canvas
             let dataUrl = null;
-            const img = container.querySelector('img');
             const canvas = container.querySelector('canvas');
-            if(canvas && typeof canvas.toDataURL === 'function'){
-                dataUrl = canvas.toDataURL('image/png');
-            } else if(img && img.src){
-                dataUrl = img.src;
-            }
+            dataUrl = canvas.toDataURL('image/png');
+            
 
             if(!dataUrl){
                 alert('Could not generate QR image.');
                 return;
             }
 
-            // trigger download
             const link = document.createElement('a');
             const lastSegment = (url.split('/').filter(Boolean).pop() || 'qrcode');
             const filename = `${lastSegment}.png`;
@@ -336,8 +326,66 @@ if(downloadQrBtn){
             link.click();
             link.remove();
         } finally {
-            // cleanup
             container.remove();
         }
     });
 }
+
+const qrDbButtons = document.querySelectorAll(".downloadQrBtnDb");
+
+if (qrDbButtons.length > 0) {
+    qrDbButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const url = btn.dataset.url;
+            dashboardGenerateQR(url);
+        });
+    });
+}
+
+async function dashboardGenerateQR(url) {
+    if(!url){
+        alert('No URL available to generate QR.');
+        return;
+    }
+     // create temporary container
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.left = '-9999px';
+        document.body.appendChild(container);
+
+        // generate QR
+        try{
+            const qr = new QRCode(container, {
+                text: url,
+                width: 256,
+                height: 256,
+                colorDark : '#000000',
+                colorLight : '#ffffff',
+                correctLevel : QRCode.CorrectLevel.H
+            });
+            // wait a tick for rendering
+            await new Promise(r => setTimeout(r, 100));
+
+            // find image or canvas
+            let dataUrl = null;
+            const canvas = container.querySelector('canvas');
+            dataUrl = canvas.toDataURL('image/png');
+            
+
+            if(!dataUrl){
+                alert('Could not generate QR image.');
+                return;
+            }
+
+            const link = document.createElement('a');
+            const lastSegment = (url.split('/').filter(Boolean).pop() || 'qrcode');
+            const filename = `${lastSegment}.png`;
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } finally {
+            container.remove();
+        }
+} 

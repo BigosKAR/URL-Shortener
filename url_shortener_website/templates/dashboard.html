@@ -17,7 +17,7 @@
         <h3>Your URLs</h3>
         <table class="dashboard-table">
           <thead>
-            <tr><th>Short URL</th><th>Destination</th><th>Clicks</th></tr>
+            <tr><th>Short URL</th><th>Destination</th><th>Clicks</th><th>Download QR Code</th></tr>
           </thead>
           <tbody>
             {% for url, url_specs in user_urls.items %}
@@ -29,11 +29,15 @@
                 </td>
                 <td><a href="{{ url_specs.original_url }}">{{ url_specs.original_url }}</a></td>
                 <td><p>{{ url_specs.clicks }}</p></td>
-            </tr>
+                <td style="text-align:center;">
+                  <button class="downloadQrBtnDb" data-url="{{ url_specs.shortened_url }}">Generate</button>
+                </td></tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
     </main>
   </body>
+  <script src="{% static './main.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
 </html>

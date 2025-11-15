@@ -150,3 +150,13 @@ def logout_account(request):
     except Exception:
         pass
     return Response({"success": "Logged out."}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def verify_session(request):
+    """
+    Verifying session between closing/opening browser. Not relying on local storage.
+    """
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return Response({"error": "unauthorized session"}, status=status.HTTP_401_UNAUTHORIZED)
+    return Response({"success": { "user_id": user_id}}, status=status.HTTP_200_OK)

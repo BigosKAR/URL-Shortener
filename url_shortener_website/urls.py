@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/signup', create_account),
     path('api/login', login_account),
     path('api/logout', logout_account),
+    path('api/verify_session', verify_session),
 ]

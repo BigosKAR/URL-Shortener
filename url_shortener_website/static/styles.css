@@ -3,16 +3,22 @@
 	src: url("./Elure-woA9w.otf") format('opentype');
 }
 
+/* Make sizing predictable and responsive */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
 body {
-	margin:0px;
+	margin: 0;
+	font-family: 'Elure', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+	font-size: clamp(14px, 1.6vw, 18px);
+	line-height: 1.4;
 }
 
 ul {
-  list-style-type: none;
-  margin: 0;
-  padding-right: 2%;
-  overflow: hidden;
-  background-color: #1c7fff;
+	list-style-type: none;
+	margin: 0;
+	padding-right: 2%;
+	overflow: hidden;
+	background-color: #1c7fff;
 }
 
 ul li {
@@ -23,7 +29,7 @@ ul li button {
   display: block;
   color: white;
   text-align: center;
-  padding: 14px 16px;
+  padding: 12px 16px;  
   text-decoration: none;
   font-family: 'Elure';
   background-color: transparent;
@@ -31,7 +37,7 @@ ul li button {
 }
 
 ul li button:hover {
-  background-color: #24e1ba;
+	background-color:#24e1ba;
 }
 
 /* (removed legacy #loginForm styles to avoid conflict with modal markup) */
@@ -88,55 +94,71 @@ ul li button:hover {
 
 #mainTitleContainer {
 	display: flex;
+	gap: clamp(12px, 2vw, 40px);
+	align-items: center;
 	justify-content: space-between;
-	margin: auto;
-	padding-top:5%;
-	padding-left:25%;
-	padding-right: 25%;
-	padding-bottom: 5%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: clamp(24px, 6vw, 80px) clamp(6px, 6vw, 80px);
 	background-color: #e9f2ff;
+	flex-wrap: wrap;
+}
+
+#mainTitleSubContainer{
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 560px;
+	min-width: 220px;
+}
+
+#urlIcon{
+	flex: 0 0 auto;
+	width: clamp(140px, 18vw, 340px);
+	height: auto;
+	align-self: center;
+	margin-left: clamp(12px, 3vw, 36px);
+	border-radius: 8px;
+	background: transparent;
 }
 
 #outputContainer {
-	padding-top:1%;
-	padding-left:20%;
-	padding-right: 20%;
-	padding-bottom: 1%;
+	padding: clamp(12px, 3vw, 32px);
+	width: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	background-color: #e9f2ff;
-
 }
 
 #mainHeader {
 	font-family: 'Elure';
-	font-size: 500%;
-	padding-right: 50px;
+	font-size: clamp(1.8rem, 6vw, 4.8rem);
+	padding-right: clamp(8px, 2vw, 40px);
+	margin: 0;
 }
 
 #subText {
 	font-family: 'Elure';
-	font-size: 150%;
+	font-size: clamp(1rem, 2.4vw, 1.6rem);
 	text-align: justify;
-	padding-right: 50px;
-	padding-bottom: 50px;
-	width: 75%;
+	padding-bottom: clamp(12px, 2.5vw, 40px);
+	flex: 1 1 320px;
+	min-width: 200px;
 }
 
 #shortenButton {
 	font-family:'Elure';
-	font-size: 50px;
-
 	transition-duration: 0.4s;
 	color: #1c7fff;
 	background-color: white;
-	width: 30%;
 	border-color: #1c7fff;
-	font-size: 25px;
+	font-size: clamp(0.9rem, 2.2vw, 1.6rem);
 	border-radius: 10px;
-	padding: 10px;
-	margin-top: 10px;
+	padding: 10px 14px;
+	margin-top: 0; /* align with input */
+	flex: 0 0 auto;
+	align-self: stretch;
+	min-width: 120px;
 }
 
 #shortenButton:hover {
@@ -147,46 +169,70 @@ ul li button:hover {
 }
 
 #userInput {
-	width: 60%;
-	width: 60%;
+	flex: 1 1 auto;
+	max-width: calc(100% - 140px);
 	border-radius: 10px;
 	padding: 10px;
-	border-color: #1c7fff;
+	border: 1px solid #1c7fff;
 	font-family:'Elure';
-	font-size: 25px;
+	font-size: clamp(1rem, 2vw, 1.4rem);
 }
 
 #userInteractionContainer {
-	height: 75px;
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	flex-wrap: nowrap;
+	width: 100%;
 }
 
 #shortUrlContainer {
-	width: 50%;
 	border-style: solid;
 	background-color: white;
 	border-color: #1c7fff;
-	padding: 10px;
+	padding: 8px 12px;
 	border-radius: 10px;
 	display: none;
-	justify-content: space-between;
+	justify-content: center; /* center content horizontally */
 	align-items: center;
-	height: 40px;
+	gap: 12px;
+	min-height: 48px;
+	min-width: 220px;
+	width: 30%;
+	box-sizing: border-box;
+	flex-wrap: wrap;
 }
 
 #shortUrl {
 	font-family:'Elure';
-	font-size: 25px;
-	padding: 5px;
+	font-size: clamp(0.9rem, 1.8vw, 1.25rem);
+	padding: 5px 8px;
+	flex: 1 1 auto;
+	text-align: center;
+	overflow-wrap: anywhere;
+	word-break: break-all;
+	max-width: 50%;
+}
+
+#shortUrlContainer > div {
+	display: inline-flex;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
 }
 
 #copyButton {
 	color:black;
-	transition-duration: 0.4s;
+	transition: background-color 160ms ease, transform 120ms ease;
 	background-color: #1c7fff;
-	border-style: hidden;
-	border-radius: 10px;
-	height: 40px;
-	width: 40px;
+	border: none;
+	border-radius: 8px;
+	height: 36px;
+	min-width: 36px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px;
 }
 
 #copyButton:hover {
@@ -194,23 +240,34 @@ ul li button:hover {
 }
 
 #copyImage {
-	height: 25px;
-	width: 25px;
+	height: 20px;
+	width: 20px;
 }
 
-#downloadQrBtn{
+.downloadQrBtnDb, #downloadQrBtn{
 	background:#fff;
 	color:#1c7fff;
 	border:1px solid #1c7fff;
 	border-radius:8px;
-	padding:8px 10px;
 	cursor:pointer;
 	font-family: 'Elure';
+	height: 36px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px 10px;
 }
-#downloadQrBtn:hover{ background:#1c7fff; color:#fff }
+.downloadQrBtnDb:hover, #downloadQrBtn:hover{ background:#1c7fff; color:#fff }
+
+@media (max-width: 520px){
+	#shortUrlContainer { justify-content: center; gap: 10px; padding: 10px; }
+	#shortUrl { order: 1; width: 100%; }
+	#shortUrlContainer > div { order: 2; }
+	#copyButton, #downloadQrBtn { height: 40px; }
+}
 
 #errorContainer, #incorrectShortcodeContainer {
-	width: 50%;
+	flex: 1 1 320px;
 	border-style: solid;
 	background-color: white;
 	border-color: red;
@@ -218,8 +275,8 @@ ul li button:hover {
 	border-radius: 10px;
 	display: none;
 	height: 40px;
-  	justify-content: center;
-  	align-items: center;
+   	justify-content: center;
+   	align-items: center;
 	transition-duration: 0.4s;
 }
 
@@ -240,26 +297,20 @@ ul li button:hover {
 
 
 #urlsContainerWrapper {
-	margin-left: 15%;
-	margin-right: 15%;
+	margin: 0 auto;
+	max-width: 1200px;
 	background-color: white;
-	padding-top:5%;
-	padding-bottom:5%;
-
+	padding: clamp(24px, 4vw, 64px) 4%;
 }
 
 #latestUrlsContainer {
-	margin-left: 15%;
-	margin-right: 15%;
+	margin: 0 auto;
 	border-color:#1c7fff;
 	border-style: solid;
 	border-radius: 10px;
 	align-items: center;
 	justify-content: center;
-	padding-bottom:50px;
-	padding-top:25px;
-	padding-left: 50px;
-	padding-right: 50px;
+	padding: clamp(18px, 3vw, 48px);
 	background-color: #e9f2ff;
 }
 
@@ -272,6 +323,8 @@ ul li button:hover {
 	border-style: solid;
 	border-radius: 10px;
 	padding: 10px;
+	width: 100%;
+	overflow-x: auto;
 }
 
 th, td {
@@ -281,15 +334,15 @@ th, td {
 
 #latestUrlsText {
 	text-align: center;
-	margin-bottom: 25px;
+	margin-bottom: clamp(12px, 2.5vw, 32px);
 	font-family: 'Elure';
-	font-size:40px;
+	font-size: clamp(1.4rem, 3.6vw, 2.8rem);
 }
 
-/* Dashboard styles - match main page design */
 nav.dashboard-nav, nav {
 	background-color: #1c7fff;
 	padding: 12px 16px;
+	height: 6.5%;
 }
 nav.dashboard-nav a, nav a {
 	color: white;
@@ -297,11 +350,24 @@ nav.dashboard-nav a, nav a {
 	text-decoration: none;
 	padding: 8px 12px;
 	display: inline-block;
+	font-size: 15px;
+	margin-right: 30px;
+}
+
+nav a:hover {
+	background-color: #24e1ba;
+}
+
+.dashboard-nav{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 24px;
 }
 
 main.dashboard-main{
 	background-color: #e9f2ff;
-	padding: 48px 12%;
+	padding: clamp(24px, 5vw, 48px) clamp(6%, 8vw, 12%);
 	min-height: calc(100vh - 80px);
 }
 
@@ -311,7 +377,7 @@ main.dashboard-main{
 	background: white;
 	border: 1px solid #1c7fff;
 	border-radius: 10px;
-	padding: 28px;
+	padding: clamp(16px, 3vw, 28px);
 	box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
@@ -344,7 +410,7 @@ h3{
 	border-collapse: collapse;
 	margin-top: 8px;
 }
-.dashboard-table th, .dashboard-table td{ 
+.dashboard-table th, .dashboard-table td, #topNav{ 
 	padding:10px; 
 	border:1px solid #1c7fff;
 	font-family: 'Elure';
@@ -353,4 +419,10 @@ h3{
 @media (max-width: 800px){
 	main.dashboard-main{ padding-left: 6%; padding-right: 6%; }
 	.dashboard-actions{ flex-direction: column; align-items: stretch }
+}
+
+@media (max-width: 520px){
+	#userInteractionContainer{ flex-direction: column; gap: 8px; }
+	#userInput{ max-width: 100%; }
+	#shortenButton{ width: 100%; align-self: stretch; }
 }

@@ -23,6 +23,7 @@
         </ul>
       </nav>
     </div>
+    <div style="background-color: #e9f2ff">
     <div id="mainTitleContainer">
       <div id="mainTitleSubContainer">
         <h1 id="mainHeader">URL Shortener</h1>
@@ -40,13 +41,16 @@
       </div>
       <img id="urlIcon" src="{% static 'url_icon.png' %}" />
     </div>
+    </div>
     <div id="outputContainer">
       <div id="shortUrlContainer">
         <a id="shortUrl"></a>
-        <button id="copyButton">
-          <img id="copyImage" src="{% static 'copy_icon.png' %}" />
-        </button>
-        <button id="downloadQrBtn" style="display:none; margin-left:8px;">Download QR</button>
+        <div>
+          <button id="copyButton">
+            <img id="copyImage" src="{% static 'copy_icon.png' %}" />
+          </button>
+          <button id="downloadQrBtn" style="display:none; margin-left:8px;">Download QR</button>
+        </div>
       </div>
       <div id="errorContainer">
         <p id="errorMessage"></p>
