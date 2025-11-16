@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect
-from .models import UrlMapping
 from django.contrib import messages # Only one message should be in the storage at all times!
 from .utils.url_service import URLService
-from .utils.url_mapping_repo import URLMappingRepository
 from .utils.session_manager import SessionManager
 
 DEFAULT_SHORTCODE = '.' # some character that does not collide with the base 62 output
@@ -31,7 +29,7 @@ def url_shortener_view(request):
         # Storage is cleared after accessing it!
         print("SHORTCODE FOUND!")
 
-    context['latest_urls'] = UrlFetcher.get_latest(amount=10)
+    context['latest_urls'] = URLService.get_latest(amount=10)
 
 
     return render('./templates/main_page.html', template_name="main_page.html", context=context)
@@ -44,7 +42,7 @@ def redirect_view(request, shortcode):
     If an invalid shortcode is provided, it will be redirect the user to the main page. (Saves the shortcode in the FallbackStorage)
 
     """
-    result = URLMappingRepository.increment_click_count(shortcode)
+    result = URLService.increment_click_count(shortcode)
     if not result:
         print("No record found! Returning to the main page.")
         if shortcode != "favicon.ico": 

@@ -1,5 +1,4 @@
 from ..models import UserAccount
-import validators
 
 # ONLY this class should manipulate the UserAccount table!
 class UserRepository():

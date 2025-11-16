@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import IntegrityError
 from ..utils.url_service import URLService
-from ..utils.url_mapping_repo import URLMappingRepository
+from ..utils.url_mapping_repository import URLMappingRepository
 from ..utils.user_service import UserService
 from ..utils.user_repository import UserRepository
 from ..utils.session_manager import SessionManager
@@ -29,12 +29,10 @@ def generate_shortcode(request):
         return Response({"error": f"Invalid URL has been provided! Try Again."}, status=status.HTTP_400_BAD_REQUEST)
 
     # Adding or Finding an entry    
-    entry, created = URLMappingRepository.get_or_create(url)
-    status = status.HTTP_200_OK
+    entry, created = URLService(request).create_mapping(url)
     if created:
-        status = status.HTTP_201_CREATED
-
-    return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status)
+        return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status.HTTP_201_CREATED)
+    return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def create_account(request):
@@ -86,7 +84,8 @@ def login_account(request):
         return Response({"error": "Invalid credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        SessionManager.set_session_id(account.id)
+        # SessionManager.set_session_id(account.id)
+        request.session['user_id'] = account.id
     except Exception:
         print("Warning: could not set session for login")
 
@@ -99,7 +98,7 @@ def logout_account(request):
     try:
         SessionManager.clear_session(request)
     except Exception:
-        pass
+        print("Could not flush session")
     return Response({"success": "Logged out."}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])

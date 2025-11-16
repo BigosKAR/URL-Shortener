@@ -1,12 +1,19 @@
-from ..models import UrlMapping, UserUrlMapping
-from ..api.views import BASE_URL
+from ..models import UrlMapping
 import validators
 import base62
-from utils.url_mapping_repo import URLMappingRepository
+from .url_mapping_repository import URLMappingRepository
+from .session_manager import SessionManager
+from .user_url_mapping_repository import UserUrlRepository
+from .user_repository import UserRepository
+
+BASE_URL = 'http://127.0.0.1:8000'
 
 class URLService():
+    def __init__(self, request):
+        self.request = request
     def get_user_urls(id):
-        urls = URLMappingRepository.get_user_urls(id)
+        mappings = UserUrlRepository.get_user_mappings(id)
+        urls = URLMappingRepository.get_mapping_urls(mappings)
 
         result = {}
         for url in urls:
@@ -36,3 +43,37 @@ class URLService():
     
     def create_shortcode(entry_id):
         return base62.encode(entry_id)
+    
+    def create_mapping(self, original_url):
+        try:
+            entry, created = UrlMapping.objects.get_or_create(
+                original_url=original_url
+            )
+        except UrlMapping.MultipleObjectsReturned:
+            print("Multiple objects found for the given shortcode and url!")
+            return False
+
+        if created:
+            # Getting the newly created entry to update the shortcode
+            entry.shortcode = URLService.create_shortcode(entry.id)
+            entry.save()
+            
+            supplied_uid = SessionManager.get_session_id(self.request)
+            try:
+                uid = int(supplied_uid)
+            except Exception:
+                print(f"Invalid user id provided: {supplied_uid}")
+                uid = None
+
+            if uid is not None:
+                user = UserRepository.get_by_id(uid)
+
+                if user is not None:
+                    UserUrlRepository.create_if_no_entry(uid, entry.id)
+            print(f"New Entry ID: {entry.id}")
+            print(f"The Base 62 encoded version: {entry.shortcode}") 
+
+        return entry, created
+    
+    def increment_click_count(shortcode):
+        return URLMappingRepository.increment_click_count(shortcode)

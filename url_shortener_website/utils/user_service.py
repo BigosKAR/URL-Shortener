@@ -1,5 +1,5 @@
 import validators
-from user_repository import UserRepository
+from .user_repository import UserRepository
 from django.contrib.auth.hashers import make_password, check_password
 
 class UserService():
