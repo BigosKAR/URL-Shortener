@@ -4,10 +4,12 @@ from django.contrib import messages # Only one message should be in the storage 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-import base62
-import validators
-from django.contrib.auth.hashers import make_password, check_password
 from django.db import IntegrityError
+from ..utils.url_service import URLService
+from ..utils.url_mapping_repo import URLMappingRepository
+from ..utils.user_service import UserService
+from ..utils.user_repository import UserRepository
+from ..utils.session_manager import SessionManager
 
 BASE_URL = 'http://127.0.0.1:8000'
 
@@ -23,60 +25,16 @@ def generate_shortcode(request):
     url = body['url']
 
     # Validating the URL
-    
-    if not validators.url(url):
+    if not URLService.is_url_valid(url):
         return Response({"error": f"Invalid URL has been provided! Try Again."}, status=status.HTTP_400_BAD_REQUEST)
-    print("Validation passed. Moving on to DB entry creation.")
 
-    # Adding or Finding an entry
-    
-    try:
-        entry, created = UrlMapping.objects.get_or_create(
-            original_url=url
-        )
-    except UrlMapping.MultipleObjectsReturned:
-        print("Multiple objects found for the given shortcode and url!")
-        return Response({"error": "Multiple objects found for the given URL and shortcode!"})
-
+    # Adding or Finding an entry    
+    entry, created = URLMappingRepository.get_or_create(url)
+    status = status.HTTP_200_OK
     if created:
-        # Getting the newly created entry to update the shortcode
-        entry.shortcode = base62.encode(entry.id)
-        entry.save()
-        
-        supplied_uid = request.session.get('user_id')
-        try:
-            uid = int(supplied_uid)
-        except Exception:
-            print(f"Invalid user id provided: {supplied_uid}")
-            uid = None
+        status = status.HTTP_201_CREATED
 
-        if uid is not None:
-            try:
-                user = UserAccount.objects.get(id=uid)
-            except UserAccount.DoesNotExist:
-                print(f"No UserAccount found for id {uid}")
-                user = None
-
-            if user is not None:
-                exists = UserUrlMapping.objects.filter(user_id=user, url_id=entry).exists()
-                if not exists:
-                    try:
-                        UserUrlMapping.objects.create(user_id=user, url_id=entry)
-                        print("Created a mapping of the URL to the current user.")
-                    except IntegrityError as e:
-                        print(f"IntegrityError creating UserUrlMapping: {e}")
-                    except Exception as e:
-                        print(f"Unexpected error creating UserUrlMapping: {e}")
-                else:
-                    print("UserUrlMapping already exists; skipping creation.")
-
-    else:
-        return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status.HTTP_200_OK)
-
-    print(f"New Entry ID: {entry.id}")
-    print(f"The Base 62 encoded version: {entry.shortcode}")
-
-    return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status.HTTP_201_CREATED)
+    return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status)
 
 @api_view(['POST'])
 def create_account(request):
@@ -91,19 +49,16 @@ def create_account(request):
     if not email or not password:
         return Response({"error": "Both 'email' and 'password' are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not validators.email(email):
+    if not UserService.is_email_valid(email):
         return Response({"error": "Invalid email address."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if UserAccount.objects.filter(email=email).exists():
+    if UserRepository.email_taken(email):
         return Response({"error": "Account with that email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # hash password and create account
-    hashed = make_password(password)
-    account = UserAccount(email=email, hashed_password=hashed)
-    account.save()
+    account = UserService.create_account(email, password)
 
     try:
-        request.session['user_id'] = account.id
+        SessionManager.set_session_id(request, account.id)
     except Exception:
         print("Warning: could not set session for new account")
 
@@ -123,20 +78,16 @@ def login_account(request):
     if not email or not password:
         return Response({"error": "Both 'email' and 'password' are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        account = UserAccount.objects.get(email=email)
-    except UserAccount.DoesNotExist:
+    account = UserRepository.get_by_email(email)
+    if not account:
         return Response({"error": "Invalid credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not check_password(password, account.hashed_password):
+    if not UserService.is_password_valid(account, password):
         return Response({"error": "Invalid credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # set session keys so the server recognizes logged-in users
     try:
-        # Using session variables to store credentials for the dashboard
-        request.session['user_id'] = account.id
+        SessionManager.set_session_id(account.id)
     except Exception:
-        # if session can't be set, continue but warn
         print("Warning: could not set session for login")
 
     return Response({"success": "Logged in."}, status=status.HTTP_200_OK)
@@ -146,7 +97,7 @@ def login_account(request):
 def logout_account(request):
     """Log the user out by clearing the session."""
     try:
-        request.session.flush()
+        SessionManager.clear_session(request)
     except Exception:
         pass
     return Response({"success": "Logged out."}, status=status.HTTP_200_OK)
@@ -156,7 +107,7 @@ def verify_session(request):
     """
     Verifying session between closing/opening browser. Not relying on local storage.
     """
-    user_id = request.session.get('user_id')
+    user_id = SessionManager.get_session_id(request)
     if not user_id:
         return Response({"error": "unauthorized session"}, status=status.HTTP_401_UNAUTHORIZED)
     return Response({"success": { "user_id": user_id}}, status=status.HTTP_200_OK)
