@@ -1,0 +1,146 @@
+from django.test import TestCase, SimpleTestCase
+from url_shortener_website.utils.url_service import URLService
+from ..models import UrlMapping, UserUrlMapping, UserAccount
+from unittest.mock import patch, MagicMock
+
+
+# Create your tests here.
+
+# Unit tests
+
+class TestUrlServiceUnit(TestCase):
+    def test_is_url_valid_success(self):
+        sample_url = "https://example.com"
+
+        result = URLService.is_url_valid(sample_url)
+
+        self.assertEqual(result, True)
+
+    def test_is_url_valid_fail(self):
+        sample_url = "https:example.com"
+
+        result = URLService.is_url_valid(sample_url)
+
+        self.assertEqual(result, False)
+
+    def test_create_shortcode(self):
+        sample_decoded = 10
+        sample_encoded = 'A'
+
+        result = URLService.create_shortcode(sample_decoded)
+
+        self.assertEqual(result, sample_encoded)
+
+    def test_is_url_valid_success(self):
+        sample_url = "https://example.com"
+
+        result = URLService.is_url_valid(sample_url)
+
+        self.assertEqual(result, True)
+
+    @patch("url_shortener_website.utils.url_mapping_repository.URLMappingRepository.get_latest_urls")
+    def test_get_latest(self, mock_repo):
+        mock_repo.return_value = [
+            {"shortcode": "def", "original_url": "https://example2.com"},
+            {"shortcode": "abc", "original_url": "https://example1.com"},
+        ]
+
+        result = URLService.get_latest(2)
+
+        self.assertEqual(result, {
+            "def": "https://example2.com",
+            "abc": "https://example1.com"
+        })
+
+    @patch("url_shortener_website.utils.user_url_mapping_repository.UserUrlRepository.get_user_mappings")
+    @patch("url_shortener_website.utils.url_mapping_repository.URLMappingRepository.get_mapping_urls")
+    def test_get_user_urls(self, mock_get_user_mappings, mock_get_mapping_urls):
+        mock_get_user_mappings.return_value = [MagicMock(shortcode="abc", original_url="https://example1.com", clicks=10)]
+    
+        result = URLService.get_user_urls(1)
+
+        self.assertEqual(result, {
+            "abc": {
+                "shortened_url": "http://127.0.0.1:8000/abc",
+                "original_url": "https://example1.com",
+                "clicks": 10
+            }
+        })
+
+    @patch("url_shortener_website.utils.url_mapping_repository.URLMappingRepository.increment_click_count")
+    def test_increment_click_count(self, mock_inc):
+        mock_inc.return_value = "https://example.com"
+
+        result = URLService.increment_click_count("abc")
+
+        mock_inc.assert_called_once_with("abc")
+        self.assertEqual(result, "https://example.com")
+
+# Integration tests
+
+class TestUrlServiceIntegration(TestCase):
+    def setUp(self):
+        class Session(dict):
+            def flush(self):
+                self.clear()
+        
+        class Request:
+            def __init__(self):
+                self.session = Session()
+        
+        self.request = Request()
+        self.url_service = URLService(request=self.request)
+
+    def test_create_mapping_new(self):
+        entry, created = self.url_service.create_mapping("https://google.com")
+
+        self.assertTrue(created)
+        self.assertEqual(entry.original_url, "https://google.com")
+        self.assertTrue(len(entry.shortcode) > 0) # the shortcode has at least 1 character
+        self.assertEqual(UrlMapping.objects.count(), 1)
+
+    def test_create_mapping_existing(self):
+        self.url_service.create_mapping("https://example1.com")
+
+        entry, created = self.url_service.create_mapping("https://example1.com")
+
+        self.assertFalse(created)
+        self.assertEqual(UrlMapping.objects.count(), 1)
+
+    def test_create_mapping_new_with_existing_user(self):
+        sample_user = UserAccount.objects.create(
+            email="test_user@gmail.com",
+            hashed_password="test"
+        )
+
+        self.request.session['user_id'] = sample_user.id
+
+        entry, created = self.url_service.create_mapping("https://example1.com")
+
+        self.assertTrue(created)
+        self.assertTrue(
+            UserUrlMapping.objects.filter(user_id=sample_user.id, url_id=entry.id).exists()
+        )
+
+    def test_create_mapping_existing_url_with_existing_user(self):
+        entry1, created1 = self.url_service.create_mapping("https://example.com")
+
+        test_user = UserAccount.objects.create(email="test_user@gmail.com", hashed_password="test")
+        self.request.session['user_id'] = test_user.id
+
+        entry2, created = self.url_service.create_mapping("https://example.com")
+
+        self.assertFalse(created)
+        self.assertEqual(entry1.id, entry2.id)
+        # Checking if the users account is not "following" an existing entry
+        self.assertTrue(
+            UserUrlMapping.objects.filter(user_id=test_user.id, url_id=entry2.id).exists()
+        )
+
+    def test_create_mapping_invalid_user_id(self):
+        self.request.session['user_id'] = 10021020
+
+        entry, created = self.url_service.create_mapping("https://baduser.com")
+
+        self.assertTrue(created)
+        self.assertEqual(UserUrlMapping.objects.count(), 0)

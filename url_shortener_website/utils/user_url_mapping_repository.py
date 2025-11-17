@@ -2,12 +2,13 @@ from ..models import UserUrlMapping, UserAccount, UrlMapping
 
 # ONLY this class should manipulate the UserUrlMapping table!
 class UserUrlRepository():
+    # TESTED
     def entry_exists(user_id, url_id):
         exists = UserUrlMapping.objects.filter(user_id=user_id, url_id=url_id).exists()
         return exists
 
+    # TESTED
     def create_entry(user_id, url_id):
-        # Resolve integer IDs to model instances before assigning to FK fields
         try:
             user = UserAccount.objects.get(id=user_id)
         except UserAccount.DoesNotExist:
