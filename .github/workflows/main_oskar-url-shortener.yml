@@ -72,12 +72,6 @@ jobs:
       contents: read
 
     steps:
-      - name: Login to Azure using system-assigned identity
-        uses: azure/login@v2
-        with:
-          auth-type: IDENTITY
-          allow-no-subscriptions: true
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
