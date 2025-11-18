@@ -72,10 +72,10 @@ jobs:
       contents: read
 
     steps:
-      - name: Login to Azure using OIDC
+      - name: Login to Azure using system-assigned identity
         uses: azure/login@v2
         with:
-          auth-type: OIDC
+          auth-type: IDENTITY
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
