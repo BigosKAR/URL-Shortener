@@ -12,7 +12,7 @@ const signUpFormBox = document.getElementById("signUpForm");
 const showSignupLink = document.getElementById("showSignup");
 const showLoginLink = document.getElementById("showLogin");
 
-const BASE_URL = "http://127.0.0.1:8000"
+const BASE_URL = "http://oskar-url-shortener-a7dpd3f8djc2eqe5.westeurope-01.azurewebsites.net";
 
 function openAuth(which, anchorEl){
     // show overlay (prevents page interaction)

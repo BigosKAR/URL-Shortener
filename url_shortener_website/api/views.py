@@ -10,8 +10,9 @@ from ..utils.url_mapping_repository import URLMappingRepository
 from ..utils.user_service import UserService
 from ..utils.user_repository import UserRepository
 from ..utils.session_manager import SessionManager
+import os
 
-BASE_URL = 'http://127.0.0.1:8000'
+BASE_URL = os.environ.get("BASE_URL", 'http://127.0.0.1:8000')
 
 # Views related to the REST API
 
