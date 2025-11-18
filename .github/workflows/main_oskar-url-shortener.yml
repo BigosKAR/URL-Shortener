@@ -54,7 +54,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.ACR_LOGIN_SERVER }}/url_shortener:${{ github.sha }}
+          tags: |
+            ${{ secrets.ACR_LOGIN_SERVER }}/url_shortener:${{ github.sha }}
+            ${{ secrets.ACR_LOGIN_SERVER }}/url_shortener:latest
 
       - name: Deployment complete
         run: echo "Image pushed to ACR. Azure Web App will automatically pull the new image."
