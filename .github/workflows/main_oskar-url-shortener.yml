@@ -36,9 +36,3 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t url_shortener:latest .
-
-      - name: Push Docker Image to Azure
-        uses: azure/webapss-container-deploy@v1
-        with:
-          app-name: 'oskar-url-shortener'
-          images: 'url_shortener:latest'
