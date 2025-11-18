@@ -61,8 +61,8 @@ jobs:
           context: .
           push: true
           tags: |
-            playlisteracr.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_A6A8DFD4D099451F9773A2909C9E39A6 }}/url_shortener:${{ github.sha }}
-            playlisteracr.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_A6A8DFD4D099451F9773A2909C9E39A6 }}/url_shortener:latest
+            playlisteracr.azurecr.io/url_shortener:${{ github.sha }}
+            playlisteracr.azurecr.io/url_shortener:latest
           file: ./Dockerfile
 
   deploy:
@@ -87,4 +87,4 @@ jobs:
         with:
           app-name: 'oskar-url-shortener'
           slot-name: 'Production'
-          images: 'playlisteracr.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_A6A8DFD4D099451F9773A2909C9E39A6 }}/url_shortener:${{ github.sha }}'
+          images: 'playlisteracr.azurecr.io/url_shortener:${{ github.sha }}'
