@@ -15,6 +15,6 @@ RUN pip install -r requirements.txt gunicorn
 
 COPY . .
 
-EXPOSE 8000
+EXPOSE 80
 
-CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --workers 4 url_shortener.wsgi:application"]
+CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:80 --workers 1 url_shortener.wsgi:application"]
