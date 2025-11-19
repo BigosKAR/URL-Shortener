@@ -1,0 +1,29 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- checkout: self
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.11'
+    addToPath: true
+  displayName: 'Set up Python 3.11'
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install dependencies'
+
+- script: |
+    python manage.py migrate
+    coverage run manage.py test
+    coverage xml
+  displayName: 'Run tests with coverage'
+
+- script: |
+    coverage report --fail-under=70
+  displayName: 'Enforce coverage threshold'
