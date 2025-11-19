@@ -12,7 +12,6 @@ const signUpFormBox = document.getElementById("signUpForm");
 const showSignupLink = document.getElementById("showSignup");
 const showLoginLink = document.getElementById("showLogin");
 
-const BASE_URL = "http://oskar-url-shortener-a7dpd3f8djc2eqe5.westeurope-01.azurewebsites.net";
 
 function openAuth(which, anchorEl){
     // show overlay (prevents page interaction)
@@ -66,7 +65,8 @@ function closeAuth(){
 if(loginBtn) loginBtn.addEventListener('click', (e)=> openAuth('login', e.currentTarget));
 if(signupBtn) signupBtn.addEventListener('click', (e)=> openAuth('signup', e.currentTarget));
 if(authClose) authClose.addEventListener('click', closeAuth);
-if(authOverlay) authOverlay.addEventListener('click', (e)=>{ if(e.target === authOverlay) closeAuth(); });
+// Do not close the auth box when clicking the overlay — require explicit 'X' click
+// if(authOverlay) authOverlay.addEventListener('click', (e)=>{ if(e.target === authOverlay) closeAuth(); });
 if(showSignupLink) showSignupLink.addEventListener('click', (e)=>{ e.preventDefault(); openAuth('signup', signupBtn || loginBtn); });
 if(showLoginLink) showLoginLink.addEventListener('click', (e)=>{ e.preventDefault(); openAuth('login', loginBtn || signupBtn); });
 
@@ -226,7 +226,7 @@ if (shortenButton) {
         const body = JSON.stringify({
             url: userInput.value,
         });
-        const response = await fetch(`${BASE_URL}/api/generate_shortcode`, {
+        const response = await fetch('/api/generate_shortcode', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -239,7 +239,8 @@ if (shortenButton) {
             displayShortUrlContainer.style.display = "flex";
 
             displayShortUrlElement.href = responseJSON.success; 
-            displayShortUrlElement.innerHTML = responseJSON.success;
+            const currentUrl = window.location.href;
+            displayShortUrlElement.innerHTML = currentUrl + responseJSON.success;
 
                 // show download QR button (UI only - no implementation)
                 if(downloadQrBtn){
@@ -253,7 +254,6 @@ if (shortenButton) {
             errorContainer.style.display = "none";
         }
         else if(response.status === 400){
-            const responseJSON = JSON.parse(xhr.response)
             displayErrorElement.innerHTML = responseJSON.error;
 
             errorContainer.style.display = "flex";

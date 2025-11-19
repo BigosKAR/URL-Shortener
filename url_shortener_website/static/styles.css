@@ -267,7 +267,7 @@ ul li button:hover {
 }
 
 #errorContainer, #incorrectShortcodeContainer {
-	flex: 1 1 320px;
+	width: 30%;
 	border-style: solid;
 	background-color: white;
 	border-color: red;
@@ -304,33 +304,39 @@ ul li button:hover {
 }
 
 #latestUrlsContainer {
-	margin: 0 auto;
-	border-color:#1c7fff;
-	border-style: solid;
-	border-radius: 10px;
-	align-items: center;
-	justify-content: center;
-	padding: clamp(18px, 3vw, 48px);
-	background-color: #e9f2ff;
+    margin: 0 auto;
+    border: 1px solid #1c7fff;
+    border-radius: 10px;
+    padding: clamp(18px, 3vw, 48px);
+    background-color: #e9f2ff;
+    overflow-x: auto; /* ensures container scrolls if table is too wide */
 }
 
 #latestUrlsTable {
-	margin-left: auto;
-	margin-right: auto;
-	font-family: 'Elure';
-	background-color:white;
-	border-color: #1c7fff;
-	border-style: solid;
-	border-radius: 10px;
-	padding: 10px;
-	width: 100%;
-	overflow-x: auto;
+    font-family: 'Elure';
+    background-color: white;
+    border: 1px solid #1c7fff;
+    border-radius: 10px;
+    padding: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    border-collapse: collapse; /* better table borders */
 }
 
-th, td {
-	padding: 10px;
-	border: 1px solid #1c7fff;
+#latestUrlsTable th,
+#latestUrlsTable td {
+    padding: 10px;
+    border: 1px solid #1c7fff;
+    word-break: break-word;   /* allows long words/links to wrap */
+    white-space: normal;      /* allows wrapping */
 }
+
+#latestUrlsTable a {
+    word-break: break-all;    /* ensures long URLs break */
+}
+
+
 
 #latestUrlsText {
 	text-align: center;
@@ -405,15 +411,24 @@ h3{
 	background: #fbfdff;
 }
 
-.dashboard-table{
-	width:100%;
-	border-collapse: collapse;
-	margin-top: 8px;
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;  /* ensures columns share space evenly */
 }
-.dashboard-table th, .dashboard-table td, #topNav{ 
-	padding:10px; 
-	border:1px solid #1c7fff;
-	font-family: 'Elure';
+
+.dashboard-table th,
+.dashboard-table td {
+    padding: 10px;
+    border: 1px solid #1c7fff;
+    font-family: 'Elure';
+    word-break: break-word;  /* wrap long content instead of stretching table */
+    white-space: normal;     /* allow multiple lines */
+}
+
+/* Optional: fix width of the long column if you know which one it is */
+.dashboard-table td.long-column {
+    width: 200px;  /* adjust as needed */
 }
 
 @media (max-width: 800px){

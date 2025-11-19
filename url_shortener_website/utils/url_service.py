@@ -5,8 +5,9 @@ from .url_mapping_repository import URLMappingRepository
 from .session_manager import SessionManager
 from .user_url_mapping_repository import UserUrlRepository
 from .user_repository import UserRepository
+import os
 
-BASE_URL = 'http://127.0.0.1:8000'
+BASE_URL = os.environ.get("WEBSITE_HOSTNAME", 'http://127.0.0.1:8000')
 
 class URLService():
     def __init__(self, request):
@@ -32,8 +33,9 @@ class URLService():
         latest_urls = URLMappingRepository.get_latest_urls(amount)
         url_json = {}
 
+
         for url in latest_urls:
-            url_json[url['shortcode']] = url['original_url']
+            url_json[f"{BASE_URL}/{url['shortcode']}"] = url['original_url']
 
         return url_json # Returns a dictionary containing latest urls
     

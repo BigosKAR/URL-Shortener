@@ -73,8 +73,8 @@
           {% for shortcode, original_url in latest_urls.items %}
           <tr>
             <td>
-              <a href="http://127.0.0.1:8000/{{shortcode}}"
-                >http://127.0.0.1:8000/{{shortcode}}</a
+              <a href="{{shortcode}}"
+                >{{shortcode}}</a
               >
             </td>
             <td><a href="{{ original_url }}">{{ original_url }}</a></td>

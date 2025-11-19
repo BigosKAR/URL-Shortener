@@ -12,8 +12,7 @@ from ..utils.user_repository import UserRepository
 from ..utils.session_manager import SessionManager
 import os
 
-BASE_URL = os.environ.get("BASE_URL", 'http://127.0.0.1:8000')
-
+BASE_URL = os.environ.get("WEBSITE_HOSTNAME", '127.0.0.1:8000')
 # Views related to the REST API
 
 @api_view(['POST'])
@@ -32,8 +31,8 @@ def generate_shortcode(request):
     # Adding or Finding an entry    
     entry, created = URLService(request).create_mapping(url)
     if created:
-        return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status.HTTP_201_CREATED)
-    return Response({"success": f"{BASE_URL}/{entry.shortcode}"}, status=status.HTTP_200_OK)
+        return Response({"success": f"{entry.shortcode}"}, status=status.HTTP_201_CREATED)
+    return Response({"success": f"{entry.shortcode}"}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def create_account(request):
