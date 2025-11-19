@@ -7,7 +7,11 @@ from .user_url_mapping_repository import UserUrlRepository
 from .user_repository import UserRepository
 import os
 
-BASE_URL = os.environ.get("WEBSITE_HOSTNAME", 'http://127.0.0.1:8000')
+BASE_URL = os.environ.get("WEBSITE_HOSTNAME", '127.0.0.1:8000')
+if BASE_URL == '127.0.0.1:8000':
+    COMPLETE_URL = 'http://' + BASE_URL
+else:
+    COMPLETE_URL = 'https://' + BASE_URL
 
 class URLService():
     def __init__(self, request):
@@ -22,7 +26,7 @@ class URLService():
         for url in urls:
             # url is a model instance; access attributes directly
             result[url.shortcode] = {
-                "shortened_url": f"{BASE_URL}/{url.shortcode}",
+                "shortened_url": f"{COMPLETE_URL}/{url.shortcode}",
                 "original_url": url.original_url,
                 "clicks": getattr(url, 'clicks', 0)
             }
@@ -35,7 +39,7 @@ class URLService():
 
 
         for url in latest_urls:
-            url_json[f"{BASE_URL}/{url['shortcode']}"] = url['original_url']
+            url_json[f"{COMPLETE_URL}/{url['shortcode']}"] = url['original_url']
 
         return url_json # Returns a dictionary containing latest urls
     
