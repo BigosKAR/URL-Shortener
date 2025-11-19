@@ -55,4 +55,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: oskarurlshorteneracr.azurecr.io/url_shortener:${{ github.sha }}
+          tags: |
+            oskarurlshorteneracr.azurecr.io/url_shortener:${{ github.sha }}
+            oskarurlshorteneracr.azurecr.io/url_shortener:latest
+
