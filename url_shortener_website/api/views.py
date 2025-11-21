@@ -1,12 +1,7 @@
-from django.shortcuts import render, redirect
-from ..models import UrlMapping, UserAccount, UserUrlMapping
-from django.contrib import messages # Only one message should be in the storage at all times!
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from django.db import IntegrityError
 from ..utils.url_service import URLService
-from ..utils.url_mapping_repository import URLMappingRepository
 from ..utils.user_service import UserService
 from ..utils.user_repository import UserRepository
 from ..utils.session_manager import SessionManager
@@ -56,7 +51,7 @@ def create_account(request):
     account = UserService.create_account(email, password)
 
     try:
-        SessionManager.set_session_id(request, account.id)
+        SessionManager(request.session).set_user_id(account.id)
     except Exception:
         print("Warning: could not set session for new account")
 
@@ -84,8 +79,7 @@ def login_account(request):
         return Response({"error": "Invalid credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        # SessionManager.set_session_id(account.id)
-        request.session['user_id'] = account.id
+        SessionManager(request.session).set_user_id(account.id)
     except Exception:
         print("Warning: could not set session for login")
 
@@ -96,7 +90,7 @@ def login_account(request):
 def logout_account(request):
     """Log the user out by clearing the session."""
     try:
-        SessionManager.clear_session(request)
+        SessionManager(request).clear()
     except Exception:
         print("Could not flush session")
     return Response({"success": "Logged out."}, status=status.HTTP_200_OK)
@@ -106,7 +100,7 @@ def verify_session(request):
     """
     Verifying session between closing/opening browser. Not relying on local storage.
     """
-    user_id = SessionManager.get_session_id(request)
+    user_id = SessionManager(request).get_user_id()
     if not user_id:
         return Response({"error": "unauthorized session"}, status=status.HTTP_401_UNAUTHORIZED)
     return Response({"success": { "user_id": user_id}}, status=status.HTTP_200_OK)

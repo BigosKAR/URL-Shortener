@@ -15,9 +15,9 @@ else:
 
 class URLService():
     def __init__(self, request):
-        self.request = request
+        self.session = request.session
 
-    # TESTED
+    @staticmethod
     def get_user_urls(id):
         mappings = UserUrlRepository.get_user_mappings(id)
         urls = URLMappingRepository.get_mapping_urls(mappings)
@@ -32,7 +32,7 @@ class URLService():
             }
         return result
     
-    # TESTED: UNIT ONLY
+    @staticmethod
     def get_latest(amount):
         latest_urls = URLMappingRepository.get_latest_urls(amount)
         url_json = {}
@@ -43,7 +43,7 @@ class URLService():
 
         return url_json # Returns a dictionary containing latest urls
     
-    # TESTED: SUCCESS/FAIL
+    @staticmethod
     def is_url_valid(url):
         result =  validators.url(url)
         if not result:
@@ -51,11 +51,10 @@ class URLService():
         print("Validation passed. Moving on to DB entry creation.")
         return True
     
-    # TESTED
+    @staticmethod
     def create_shortcode(entry_id):
         return base62.encode(entry_id)
     
-    # TESTED
     def create_mapping(self, original_url):
         try:
             entry, created = UrlMapping.objects.get_or_create(
@@ -72,7 +71,7 @@ class URLService():
             print(f"New Entry ID: {entry.id}")
             print(f"The Base 62 encoded version: {entry.shortcode}") 
             
-        supplied_uid = SessionManager.get_session_id(self.request)
+        supplied_uid = SessionManager(self.session).get_user_id()
         try:
             uid = int(supplied_uid)
         except Exception:
@@ -87,6 +86,6 @@ class URLService():
 
         return entry, created
     
-    # TESTED
+    @staticmethod
     def increment_click_count(shortcode):
         return URLMappingRepository.increment_click_count(shortcode)

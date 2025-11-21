@@ -1,9 +1,12 @@
 class SessionManager():
-    def set_session_id(request, user_id):
-        request.session['user_id'] = user_id
+    def __init__(self, request):
+        self.session = request.session
 
-    def get_session_id(request):
-        return request.session.get('user_id')
+    def set_user_id(self, user_id):
+        self.session['user_id'] = user_id
+
+    def get_user_id(self):
+        return self.session.get('user_id')
     
-    def clear_session(request):
-        request.session.flush()
+    def clear(self):
+        self.session.flush()

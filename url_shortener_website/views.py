@@ -59,7 +59,7 @@ def dashboard_view(request):
     """
     View designed to look at your own URLs to check statistics like click counters
     """
-    user_id = SessionManager.get_session_id(request)
+    user_id = SessionManager(request.session).get_user_id()
     if not user_id:
         print("Unauthorized access to dashboard.")
         return redirect('/')

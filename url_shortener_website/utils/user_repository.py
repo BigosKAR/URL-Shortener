@@ -2,30 +2,31 @@ from ..models import UserAccount
 
 # ONLY this class should manipulate the UserAccount table!
 class UserRepository():
-    # TESTED
-    def get_by_id(id):
+    def __init__(self):
+        self.cls_model = UserAccount
+
+    def get_by_id(self, id: int) -> UserAccount | None:
+        """Fetches account object by ID and returns if found, otherwise None"""
         try:
-            user = UserAccount.objects.get(id=id)
-        except UserAccount.DoesNotExist:
-            print(f"No UserAccount found for id {id}")
+            user = self.cls_model.objects.get(id=id)
+        except self.cls_model.DoesNotExist:
             user = None
         return user
     
-    # TESTED
-    def get_by_email(email):
+    def get_by_email(self, email: str) -> UserAccount | None:
+        """Fetches account object by unique email and returns if found, otherwise None"""
         try:
-            account = UserAccount.objects.get(email=email)
-        except UserAccount.DoesNotExist:
-            print(f"No UserAccount found for email:")
+            account = self.cls_model.objects.get(email=email)
+        except self.cls_model.DoesNotExist:
             account = None
         return account
     
-    # TESTED
-    def email_taken(email):
-        return UserAccount.objects.filter(email=email).exists()
+    def email_taken(self, email: str) -> bool:
+        """Checks if an email is already taken by another entry. Returns True/False"""
+        return self.cls_model.objects.filter(email=email).exists()
 
-    # TESTED
-    def create_user(email, password):
-        account = UserAccount(email=email, hashed_password=password)
+    def create_user(self, email: str, password: str) -> UserAccount:
+        """Creates a new account with the given credentials."""
+        account = self.cls_model(email=email, hashed_password=password)
         account.save()
         return account
