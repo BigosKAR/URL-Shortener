@@ -14,7 +14,7 @@ class UserService():
     # TESTED
     def create_account(email, password):
         hashed = UserService.hash_password(password)
-        return UserRepository.create_user(email, hashed)
+        return UserRepository().create_user(email, hashed)
     
     # TESTED
     def is_password_valid(user, password):

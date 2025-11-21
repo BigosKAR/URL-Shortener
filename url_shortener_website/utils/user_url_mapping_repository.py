@@ -1,6 +1,4 @@
-from ..models import UserUrlMapping, UserAccount, UrlMapping
-from user_repository import UserRepository
-from url_repository import UrlRepository
+from ..models import UserUrlMapping
 
 # ONLY this class should manipulate the UserUrlMapping table!
 class UserUrlRepository():

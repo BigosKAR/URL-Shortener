@@ -18,7 +18,7 @@ class TestUserRepositoryIntegration(TestCase):
         self.assertIsNone(fetched)
 
     def test_get_by_email_exists(self):
-        test_user = UserAccount.objects.createcreate(email="test_user@example.com", hashed_password="test")
+        test_user = UserAccount.objects.create(email="test_user@example.com", hashed_password="test")
         fetched = self.repo.get_by_email("test_user@example.com")
         self.assertEqual(fetched, test_user)
 

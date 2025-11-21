@@ -38,7 +38,7 @@ class TestUrlServiceUnit(TestCase):
 
         self.assertEqual(result, True)
 
-    @patch("url_shortener_website.utils.url_mapping_repository.URLMappingRepository.get_latest_urls")
+    @patch("url_shortener_website.utils.url_repository.UrlRepository.get_latest")
     def test_get_latest(self, mock_repo):
         mock_repo.return_value = [
             {"shortcode": "def", "original_url": "https://example2.com"},
@@ -48,12 +48,12 @@ class TestUrlServiceUnit(TestCase):
         result = URLService.get_latest(2)
 
         self.assertEqual(result, {
-            "def": "https://example2.com",
-            "abc": "https://example1.com"
+            "http://127.0.0.1:8000/def": "https://example2.com",
+            "http://127.0.0.1:8000/abc": "https://example1.com"
         })
 
     @patch("url_shortener_website.utils.user_url_mapping_repository.UserUrlRepository.get_user_mappings")
-    @patch("url_shortener_website.utils.url_mapping_repository.URLMappingRepository.get_mapping_urls")
+    @patch("url_shortener_website.utils.url_repository.UrlRepository.get_multiple_by_id")
     def test_get_user_urls(self, mock_get_user_mappings, mock_get_mapping_urls):
         mock_get_user_mappings.return_value = [MagicMock(shortcode="abc", original_url="https://example1.com", clicks=10)]
     
@@ -67,11 +67,11 @@ class TestUrlServiceUnit(TestCase):
             }
         })
 
-    @patch("url_shortener_website.utils.url_mapping_repository.URLMappingRepository.increment_click_count")
-    def test_increment_click_count(self, mock_inc):
+    @patch("url_shortener_website.utils.url_repository.UrlRepository.increment_clicks")
+    def test_increment_clicks(self, mock_inc):
         mock_inc.return_value = "https://example.com"
 
-        result = URLService.increment_click_count("abc")
+        result = URLService({}).increment_clicks("abc")
 
         mock_inc.assert_called_once_with("abc")
         self.assertEqual(result, "https://example.com")
@@ -89,7 +89,7 @@ class TestUrlServiceIntegration(TestCase):
                 self.session = Session()
         
         self.request = Request()
-        self.url_service = URLService(request=self.request)
+        self.url_service = URLService(request=self.request, )
 
     def test_create_mapping_new(self):
         entry, created = self.url_service.create_mapping("https://google.com")

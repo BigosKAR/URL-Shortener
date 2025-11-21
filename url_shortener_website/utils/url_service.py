@@ -15,12 +15,12 @@ else:
 
 class URLService():
     def __init__(self, request):
-        self.session = request.session
+        self.request = request
 
     @staticmethod
     def get_user_urls(id):
-        ids = UserUrlRepository.get_user_mappings(id)
-        urls_objs = UrlRepository.get_multiple_by_id(ids)
+        ids = UserUrlRepository().get_user_mappings(id)
+        urls_objs = UrlRepository().get_multiple_by_id(ids)
 
         result = {}
         for url in urls_objs:
@@ -38,7 +38,7 @@ class URLService():
         url_json = {}
 
 
-        for url in latest_urls.values:
+        for url in latest_urls:
             url_json[f"{COMPLETE_URL}/{url['shortcode']}"] = url['original_url']
 
         return url_json # Returns a dictionary containing latest urls
@@ -56,7 +56,9 @@ class URLService():
         return base62.encode(entry_id)
     
     def create_mapping(self, original_url):
-        entry, created = UrlRepository().get_or_create(original_url)
+        user_repo = UserRepository()
+        url_repo = UrlRepository()
+        entry, created = url_repo.get_or_create(original_url)
         if entry is None:
             return False
         
@@ -67,7 +69,7 @@ class URLService():
             print(f"New Entry ID: {entry.id}")
             print(f"The Base 62 encoded version: {entry.shortcode}") 
             
-        supplied_uid = SessionManager(self.session).get_user_id()
+        supplied_uid = SessionManager(self.request).get_user_id()
         try:
             uid = int(supplied_uid)
         except Exception:
@@ -75,13 +77,13 @@ class URLService():
             uid = None
 
         if uid is not None:
-            user = UserRepository.get_by_id(uid)
+            user = user_repo.get_by_id(uid)
 
             if user is not None:
-                UserUrlRepository.create_if_no_entry(uid, entry.id)
+                UserUrlRepository(user_repo=user_repo, url_repo=url_repo).create_if_no_entry(uid, entry.id,)
 
         return entry, created
     
     @staticmethod
     def increment_clicks(shortcode):
-        return UrlRepository.increment_clicks(shortcode)
+        return UrlRepository().increment_clicks(shortcode)

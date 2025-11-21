@@ -44,7 +44,7 @@ def redirect_view(request, shortcode):
     If an invalid shortcode is provided, it will be redirect the user to the main page. (Saves the shortcode in the FallbackStorage)
 
     """
-    result = URLService.increment_click_count(shortcode)
+    result = URLService(request).increment_clicks(shortcode)
     if not result:
         print("No record found! Returning to the main page.")
         if shortcode != "favicon.ico": 
@@ -52,14 +52,14 @@ def redirect_view(request, shortcode):
         return redirect("/")
 
     print(f"[{shortcode}] - Redirecting to the following website: {result}")
-    return redirect(result)
+    return redirect(result.original_url)
 
 
 def dashboard_view(request):
     """
     View designed to look at your own URLs to check statistics like click counters
     """
-    user_id = SessionManager(request.session).get_user_id()
+    user_id = SessionManager(request).get_user_id()
     if not user_id:
         print("Unauthorized access to dashboard.")
         return redirect('/')

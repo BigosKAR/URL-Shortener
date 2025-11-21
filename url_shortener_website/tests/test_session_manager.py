@@ -9,16 +9,19 @@ class TestSessionManager(SimpleTestCase):
             def flush(self):
                 self.clear()
         
-        self.session = Session()
-        self.manager = SessionManager(self.session)
+        class Request():
+            def __init__(self, session):
+                self.session = session
+        self.request = Request(Session())
+        self.manager = SessionManager(self.request)
 
     def test_set_session_id(self):
         self.manager.set_user_id(user_id=123)
-        self.assertEqual(self.session.get('user_id'), 123)
+        self.assertEqual(self.request.session.get('user_id'), 123)
 
     def test_get_session_id(self):
         TEST_ID = 456
-        self.session['user_id'] = TEST_ID
+        self.request.session['user_id'] = TEST_ID
         user_id = self.manager.get_user_id()
         self.assertEqual(user_id, TEST_ID)
 
@@ -27,7 +30,7 @@ class TestSessionManager(SimpleTestCase):
         self.assertIsNone(user_id)
 
     def test_clearing_session(self):
-        self.session['user_id'] = 789
+        self.request.session['user_id'] = 789
         self.manager.clear()
-        self.assertNotIn('user_id', self.session)
-        self.assertEqual(self.session, {})
+        self.assertNotIn('user_id', self.request.session)
+        self.assertEqual(self.request.session, {})
