@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages # Only one message should be in the storage at all times!
 from .utils.url_service import URLService
 from .utils.session_manager import SessionManager
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from django.http import HttpResponse
 
 DEFAULT_SHORTCODE = '.' # some character that does not collide with the base 62 output
 
@@ -65,3 +67,6 @@ def dashboard_view(request):
     context = {}
     context['user_urls'] = URLService.get_user_urls(user_id)
     return render('./templates/dashboard.html', template_name='dashboard.html', context=context)
+
+def metrics(request):
+    return HttpResponse(generate_latest(), content_type=CONTENT_TYPE_LATEST)
