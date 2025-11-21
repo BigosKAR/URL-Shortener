@@ -1,10 +1,5 @@
-from django.test import TestCase, SimpleTestCase
+from django.test import SimpleTestCase
 from url_shortener_website.utils.session_manager import SessionManager
-from url_shortener_website.utils.url_mapping_repository import URLMappingRepository
-from url_shortener_website.utils.url_service import URLService
-from url_shortener_website.utils.user_repository import UserRepository
-from url_shortener_website.utils.user_service import UserService
-from url_shortener_website.utils.user_url_mapping_repository import UserUrlRepository
 
 # Create your tests here.
 

@@ -1,11 +1,11 @@
 from ..models import UrlMapping
-import validators
 import base62
-from .url_mapping_repository import URLMappingRepository
+from .url_repository import UrlRepository
 from .session_manager import SessionManager
 from .user_url_mapping_repository import UserUrlRepository
 from .user_repository import UserRepository
 import os
+import validators
 
 BASE_URL = os.environ.get("WEBSITE_HOSTNAME", '127.0.0.1:8000')
 if BASE_URL == '127.0.0.1:8000':
@@ -19,11 +19,11 @@ class URLService():
 
     @staticmethod
     def get_user_urls(id):
-        mappings = UserUrlRepository.get_user_mappings(id)
-        urls = URLMappingRepository.get_mapping_urls(mappings)
+        ids = UserUrlRepository.get_user_mappings(id)
+        urls_objs = UrlRepository.get_multiple_by_id(ids)
 
         result = {}
-        for url in urls:
+        for url in urls_objs:
             # url is a model instance; access attributes directly
             result[url.shortcode] = {
                 "shortened_url": f"{COMPLETE_URL}/{url.shortcode}",
@@ -34,11 +34,11 @@ class URLService():
     
     @staticmethod
     def get_latest(amount):
-        latest_urls = URLMappingRepository.get_latest_urls(amount)
+        latest_urls = UrlRepository().get_latest(amount)
         url_json = {}
 
 
-        for url in latest_urls:
+        for url in latest_urls.values:
             url_json[f"{COMPLETE_URL}/{url['shortcode']}"] = url['original_url']
 
         return url_json # Returns a dictionary containing latest urls
@@ -56,14 +56,10 @@ class URLService():
         return base62.encode(entry_id)
     
     def create_mapping(self, original_url):
-        try:
-            entry, created = UrlMapping.objects.get_or_create(
-                original_url=original_url
-            )
-        except UrlMapping.MultipleObjectsReturned:
-            print("Multiple objects found for the url!")
+        entry, created = UrlRepository().get_or_create(original_url)
+        if entry is None:
             return False
-
+        
         if created:
             # Getting the newly created entry to update the shortcode
             entry.shortcode = URLService.create_shortcode(entry.id)
@@ -87,5 +83,5 @@ class URLService():
         return entry, created
     
     @staticmethod
-    def increment_click_count(shortcode):
-        return URLMappingRepository.increment_click_count(shortcode)
+    def increment_clicks(shortcode):
+        return UrlRepository.increment_clicks(shortcode)

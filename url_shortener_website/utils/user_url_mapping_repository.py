@@ -1,39 +1,41 @@
 from ..models import UserUrlMapping, UserAccount, UrlMapping
+from user_repository import UserRepository
+from url_repository import UrlRepository
 
 # ONLY this class should manipulate the UserUrlMapping table!
 class UserUrlRepository():
-    # TESTED
-    def entry_exists(user_id, url_id):
-        exists = UserUrlMapping.objects.filter(user_id=user_id, url_id=url_id).exists()
-        return exists
+    def __init__(self, user_repo=None, url_repo=None):
+        self.model_cls = UserUrlMapping
+        self.user_repo = user_repo
+        self.url_repo = url_repo
+    
+    def _entry_exists(self, user_id: int, url_id: int) -> bool:
+        """Returns boolean indicating if an entry with the user and url id exists."""
+        return self.model_cls.objects.filter(user_id=user_id, url_id=url_id).exists()
 
-    # TESTED
-    def create_entry(user_id, url_id):
-        try:
-            user = UserAccount.objects.get(id=user_id)
-        except UserAccount.DoesNotExist:
-            print(f"Cannot create mapping: UserAccount with id={user_id} does not exist.")
+    def _create_entry(self, user_id: int, url_id: int) -> bool:
+        """Creates an entry with the given id's"""
+        user = self.user_repo.get_by_id(user_id)
+        if user is None:
+            return False
+
+        url = self.url_repo.get_by_id(url_id)
+        if url is None:
             return False
 
         try:
-            url = UrlMapping.objects.get(id=url_id)
-        except UrlMapping.DoesNotExist:
-            print(f"Cannot create mapping: UrlMapping with id={url_id} does not exist.")
-            return False
-
-        try:
-            UserUrlMapping.objects.create(user_id=user, url_id=url)
-            print("Created a mapping of the URL to the current user.")
+            self.model_cls.objects.create(user_id=user, url_id=url)
         except Exception as e:
-            print(f"Unexpected error creating UserUrlMapping: {e}")
             return False
         return True
     
-    def create_if_no_entry(user_id, url_id):
-        if not UserUrlRepository.entry_exists(user_id, url_id):
-            UserUrlRepository.create_entry(user_id, url_id)
+    def create_if_no_entry(self, user_id: int, url_id: int) -> bool:
+        """Creates an entry if it does not exists, otherwise it returns False"""
+        if not self._entry_exists(user_id, url_id):
+            return self._create_entry(user_id, url_id)
         else:
-            print("UserUrlMapping already exists; skipping creation.")
+            return False
 
-    def get_user_mappings(user_id):
-        return UserUrlMapping.objects.filter(user_id=user_id).values_list('url_id', flat=True)
+    def get_user_mappings(self, user_id: int)-> bool:
+        """Returns entries for a specific user using their id."""
+        return self.model_cls.objects.filter(user_id=user_id).values_list('url_id', flat=True)
