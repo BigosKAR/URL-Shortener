@@ -36,10 +36,6 @@ jobs:
   build-and-deploy:
           runs-on: ubuntu-latest
           steps:
-          # checkout the repo
-          - name: 'Checkout GitHub Action'
-            uses: actions/checkout@main
-            
           - name: 'Login via Azure CLI'
             uses: azure/login@v1
             with:
@@ -59,8 +55,8 @@ jobs:
               username: ${{ secrets.ACR_USERNAME }}
               password: ${{ secrets.ACR_PASSWORD }}
           - run: |
-              docker build . -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ secrets.WEBAPP_NAME }}:${{ github.sha }}
-              docker push ${{ secrets.ACR_LOGIN_SERVER }}/${{ secrets.WEBAPP_NAME }}:${{ github.sha }}
+              docker build . -t "${{ secrets.ACR_LOGIN_SERVER }}/${{ secrets.WEBAPP_NAME }}:${{ github.sha }}"
+              docker push "${{ secrets.ACR_LOGIN_SERVER }}/${{ secrets.WEBAPP_NAME }}:${{ github.sha }}"
 
           - name: Deploy to Azure Web App
             uses: azure/webapps-deploy@v2
