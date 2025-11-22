@@ -5,6 +5,7 @@ from ..utils.url_service import URLService
 from ..utils.user_service import UserService
 from ..utils.user_repository import UserRepository
 from ..utils.session_manager import SessionManager
+from ..utils.validation_service import ValidationService
 import os
 
 BASE_URL = os.environ.get("WEBSITE_HOSTNAME", '127.0.0.1:8000')
@@ -13,18 +14,19 @@ BASE_URL = os.environ.get("WEBSITE_HOSTNAME", '127.0.0.1:8000')
 @api_view(['POST'])
 def generate_shortcode(request):
     # url = request.POST.get('url', None)
+    url_service = URLService(request)
     body = request.data
     if len(body) == 0:
         return Response({"error": "No URL provided."}, status=status.HTTP_400_BAD_REQUEST)
 
     url = body['url']
-
+    
     # Validating the URL
-    if not URLService.is_url_valid(url):
+    if not url_service.is_url_valid(url):
         return Response({"error": f"Invalid URL has been provided! Try Again."}, status=status.HTTP_400_BAD_REQUEST)
 
     # Adding or Finding an entry    
-    entry, created = URLService(request).create_mapping(url)
+    entry, created = url_service.create_mapping(url)
     if created:
         return Response({"success": f"{entry.shortcode}"}, status=status.HTTP_201_CREATED)
     return Response({"success": f"{entry.shortcode}"}, status=status.HTTP_200_OK)
@@ -42,16 +44,16 @@ def create_account(request):
     if not email or not password:
         return Response({"error": "Both 'email' and 'password' are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not UserService.is_email_valid(email):
+    if not ValidationService.is_email_valid(email):
         return Response({"error": "Invalid email address."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if UserRepository.email_taken(email):
+    if UserRepository().email_taken(email):
         return Response({"error": "Account with that email already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-    account = UserService.create_account(email, password)
+    account = UserService().create_account(email, password)
 
     try:
-        SessionManager(request.session).set_user_id(account.id)
+        SessionManager(request).set_user_id(account.id)
     except Exception:
         print("Warning: could not set session for new account")
 
@@ -71,15 +73,15 @@ def login_account(request):
     if not email or not password:
         return Response({"error": "Both 'email' and 'password' are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-    account = UserRepository.get_by_email(email)
+    account = UserRepository().get_by_email(email)
     if not account:
         return Response({"error": "Invalid credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if not UserService.is_password_valid(account, password):
+    if not ValidationService.is_password_valid(account, password):
         return Response({"error": "Invalid credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        SessionManager(request.session).set_user_id(account.id)
+        SessionManager(request).set_user_id(account.id)
     except Exception:
         print("Warning: could not set session for login")
 

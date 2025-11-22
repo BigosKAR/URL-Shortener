@@ -9,32 +9,36 @@ from unittest.mock import patch, MagicMock
 # Unit tests
 
 class TestUrlServiceUnit(TestCase):
+    def setUp(self):
+        class Session(dict):
+            def flush(self):
+                self.clear()
+        
+        class Request:
+            def __init__(self):
+                self.session = Session()
+        
+        self.request = Request()
+        self.url_service = URLService(request=self.request)
+
     def test_is_url_valid_success(self):
         sample_url = "https://example.com"
 
-        result = URLService.is_url_valid(sample_url)
+        result = self.url_service.is_url_valid(sample_url)
 
         self.assertEqual(result, True)
 
     def test_is_url_valid_fail(self):
         sample_url = "https:example.com"
 
-        result = URLService.is_url_valid(sample_url)
+        result = self.url_service.is_url_valid(sample_url)
 
         self.assertEqual(result, False)
-
-    def test_create_shortcode(self):
-        sample_decoded = 10
-        sample_encoded = 'A'
-
-        result = URLService.create_shortcode(sample_decoded)
-
-        self.assertEqual(result, sample_encoded)
 
     def test_is_url_valid_success(self):
         sample_url = "https://example.com"
 
-        result = URLService.is_url_valid(sample_url)
+        result = self.url_service.is_url_valid(sample_url)
 
         self.assertEqual(result, True)
 
@@ -45,7 +49,7 @@ class TestUrlServiceUnit(TestCase):
             {"shortcode": "abc", "original_url": "https://example1.com"},
         ]
 
-        result = URLService.get_latest(2)
+        result = self.url_service.get_latest(2)
 
         self.assertEqual(result, {
             "http://127.0.0.1:8000/def": "https://example2.com",
@@ -57,7 +61,7 @@ class TestUrlServiceUnit(TestCase):
     def test_get_user_urls(self, mock_get_user_mappings, mock_get_mapping_urls):
         mock_get_user_mappings.return_value = [MagicMock(shortcode="abc", original_url="https://example1.com", clicks=10)]
     
-        result = URLService.get_user_urls(1)
+        result = self.url_service.get_user_urls(1)
 
         self.assertEqual(result, {
             "abc": {
@@ -71,7 +75,7 @@ class TestUrlServiceUnit(TestCase):
     def test_increment_clicks(self, mock_inc):
         mock_inc.return_value = "https://example.com"
 
-        result = URLService({}).increment_clicks("abc")
+        result = self.url_service.increment_clicks("abc")
 
         mock_inc.assert_called_once_with("abc")
         self.assertEqual(result, "https://example.com")
@@ -89,7 +93,7 @@ class TestUrlServiceIntegration(TestCase):
                 self.session = Session()
         
         self.request = Request()
-        self.url_service = URLService(request=self.request, )
+        self.url_service = URLService(request=self.request)
 
     def test_create_mapping_new(self):
         entry, created = self.url_service.create_mapping("https://google.com")

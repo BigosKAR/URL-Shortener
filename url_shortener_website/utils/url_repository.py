@@ -14,7 +14,7 @@ class UrlRepository():
         return self.model_cls.objects.order_by("-id")[:amount]
     
     def increment_clicks(self, shortcode: str):
-        url_obj = self.__get_by_shortcode(shortcode)
+        url_obj = self._get_by_shortcode(shortcode)
         if not url_obj:
             return None
         
@@ -23,7 +23,7 @@ class UrlRepository():
 
         return url_obj
     
-    def __get_by_shortcode(self, shortcode: str):
+    def _get_by_shortcode(self, shortcode: str):
         """Private functions for fetching a url object from a shortcode"""
         try:
             url_obj = self.model_cls.objects.get(shortcode=shortcode)

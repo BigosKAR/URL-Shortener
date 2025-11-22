@@ -18,6 +18,7 @@ def url_shortener_view(request):
     The latest URLs are also passed to the template to be displayed on the site.
 
     """
+    url_service = URLService(request)
     context = {}
     saved_messages = messages.get_messages(request)
 
@@ -31,7 +32,7 @@ def url_shortener_view(request):
         # Storage is cleared after accessing it!
         print("SHORTCODE FOUND!")
 
-    context['latest_urls'] = URLService.get_latest(amount=10)
+    context['latest_urls'] = url_service.get_latest(amount=10)
 
 
     return render('./templates/main_page.html', template_name="main_page.html", context=context)
@@ -44,7 +45,8 @@ def redirect_view(request, shortcode):
     If an invalid shortcode is provided, it will be redirect the user to the main page. (Saves the shortcode in the FallbackStorage)
 
     """
-    result = URLService(request).increment_clicks(shortcode)
+    url_service = URLService(request)
+    result = url_service.increment_clicks(shortcode)
     if not result:
         print("No record found! Returning to the main page.")
         if shortcode != "favicon.ico": 
@@ -59,13 +61,14 @@ def dashboard_view(request):
     """
     View designed to look at your own URLs to check statistics like click counters
     """
+    url_service = URLService(request)
     user_id = SessionManager(request).get_user_id()
     if not user_id:
         print("Unauthorized access to dashboard.")
         return redirect('/')
 
     context = {}
-    context['user_urls'] = URLService.get_user_urls(user_id)
+    context['user_urls'] = url_service.get_user_urls(user_id)
     return render('./templates/dashboard.html', template_name='dashboard.html', context=context)
 
 def metrics(request):

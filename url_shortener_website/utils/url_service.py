@@ -4,6 +4,9 @@ from .url_repository import UrlRepository
 from .session_manager import SessionManager
 from .user_url_mapping_repository import UserUrlRepository
 from .user_repository import UserRepository
+from .url_fetcher_service import UrlFetcherService
+from .validation_service import ValidationService
+from .mapping_creation_service import MappingCreationService
 import os
 import validators
 
@@ -16,74 +19,35 @@ else:
 class URLService():
     def __init__(self, request):
         self.request = request
+        self.url_repo = UrlRepository()
+        self.user_repo = UserRepository()
+        self.user_url_repo = UserUrlRepository(
+            user_repo=self.user_repo,
+            url_repo=self.url_repo
+        )
+        self.url_fetcher = UrlFetcherService(
+            url_repo=self.url_repo,
+            user_url_repo=self.user_url_repo
+        )
+        self.validator = ValidationService()
+        self.mapping_creator = MappingCreationService(self.request) 
 
-    @staticmethod
-    def get_user_urls(id):
-        ids = UserUrlRepository().get_user_mappings(id)
-        urls_objs = UrlRepository().get_multiple_by_id(ids)
-
-        result = {}
-        for url in urls_objs:
-            # url is a model instance; access attributes directly
-            result[url.shortcode] = {
-                "shortened_url": f"{COMPLETE_URL}/{url.shortcode}",
-                "original_url": url.original_url,
-                "clicks": getattr(url, 'clicks', 0)
-            }
-        return result
+    def get_user_urls(self, id):
+        """Returns urls which are assigned to the user with this specific ID."""
+        return self.url_fetcher.get_user_urls(id)
     
-    @staticmethod
-    def get_latest(amount):
-        latest_urls = UrlRepository().get_latest(amount)
-        url_json = {}
-
-
-        for url in latest_urls:
-            url_json[f"{COMPLETE_URL}/{url['shortcode']}"] = url['original_url']
-
-        return url_json # Returns a dictionary containing latest urls
+    def get_latest(self, amount):
+        """Returns the latest urls in terms of order."""
+        return self.url_fetcher.get_latest(amount)
     
-    @staticmethod
-    def is_url_valid(url):
-        result =  validators.url(url)
-        if not result:
-            return False
-        print("Validation passed. Moving on to DB entry creation.")
-        return True
-    
-    @staticmethod
-    def create_shortcode(entry_id):
-        return base62.encode(entry_id)
+    def is_url_valid(self, url):
+        """Checks if the provided url is valid."""
+        return self.validator.is_url_valid(url)
     
     def create_mapping(self, original_url):
-        user_repo = UserRepository()
-        url_repo = UrlRepository()
-        entry, created = url_repo.get_or_create(original_url)
-        if entry is None:
-            return False
-        
-        if created:
-            # Getting the newly created entry to update the shortcode
-            entry.shortcode = URLService.create_shortcode(entry.id)
-            entry.save()
-            print(f"New Entry ID: {entry.id}")
-            print(f"The Base 62 encoded version: {entry.shortcode}") 
-            
-        supplied_uid = SessionManager(self.request).get_user_id()
-        try:
-            uid = int(supplied_uid)
-        except Exception:
-            print(f"Invalid user id provided: {supplied_uid}")
-            uid = None
-
-        if uid is not None:
-            user = user_repo.get_by_id(uid)
-
-            if user is not None:
-                UserUrlRepository(user_repo=user_repo, url_repo=url_repo).create_if_no_entry(uid, entry.id,)
-
-        return entry, created
+        """Creates a mapping for the provided url. If there is a user logged in, it will connect that entry to the user."""
+        return self.mapping_creator.create_mapping(original_url)
     
-    @staticmethod
-    def increment_clicks(shortcode):
-        return UrlRepository().increment_clicks(shortcode)
+    def increment_clicks(self, shortcode):
+        """Increments clicks for an entry with the provided shortcode."""
+        return self.url_repo.increment_clicks(shortcode)
