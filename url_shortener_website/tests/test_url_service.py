@@ -1,7 +1,7 @@
 from django.test import TestCase, SimpleTestCase
 from url_shortener_website.utils.url_service import URLService
 from ..models import UrlMapping, UserUrlMapping, UserAccount
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 
 
 # Create your tests here.
@@ -17,7 +17,7 @@ class TestUrlServiceUnit(TestCase):
         class Request:
             def __init__(self):
                 self.session = Session()
-        
+
         self.request = Request()
         self.url_service = URLService(request=self.request)
 
@@ -43,10 +43,17 @@ class TestUrlServiceUnit(TestCase):
         self.assertEqual(result, True)
 
     @patch("url_shortener_website.utils.url_repository.UrlRepository.get_latest")
-    def test_get_latest(self, mock_repo):
-        mock_repo.return_value = [
-            {"shortcode": "def", "original_url": "https://example2.com"},
-            {"shortcode": "abc", "original_url": "https://example1.com"},
+    def test_get_latest(self, mock_get_latest):
+        mock_url1 = Mock()
+        mock_url1.shortcode = "def"
+        mock_url1.original_url = "https://example2.com"
+
+        mock_url2 = Mock()
+        mock_url2.shortcode = "abc"
+        mock_url2.original_url = "https://example1.com"
+        mock_get_latest.return_value = [
+            mock_url1,
+            mock_url2,
         ]
 
         result = self.url_service.get_latest(2)

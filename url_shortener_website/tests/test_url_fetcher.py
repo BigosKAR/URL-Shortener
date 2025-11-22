@@ -1,6 +1,6 @@
 from django.test import TestCase, SimpleTestCase
 from url_shortener_website.utils.url_service import URLService
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 from url_shortener_website.utils.url_fetcher_service import UrlFetcherService
 from url_shortener_website.utils.user_url_mapping_repository import UserUrlRepository
 
@@ -16,9 +16,16 @@ class TestUrlFetcherUnit(TestCase):
         )
 
     def test_get_latest(self):
+        mock_url1 = Mock()
+        mock_url1.shortcode = "def"
+        mock_url1.original_url = "https://example2.com"
+
+        mock_url2 = Mock()
+        mock_url2.shortcode = "abc"
+        mock_url2.original_url = "https://example1.com"
         self.mock_url_repo.get_latest.return_value = [
-            {"shortcode": "def", "original_url": "https://example2.com"},
-            {"shortcode": "abc", "original_url": "https://example1.com"},
+            mock_url2,
+            mock_url1
         ]
 
         result = self.url_fetcher.get_latest(2)
